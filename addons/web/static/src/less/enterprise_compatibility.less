@@ -1,0 +1,41 @@
+// ------------------------------------------------------------------
+// Odoo
+// ------------------------------------------------------------------
+
+// This file is necessary to make the community edition of the Odoo web
+// client compatible with the enterprise edition.  
+
+// The problem is that we have two web clients in parallel, and every
+// addons should behave properly with both.
+
+@odoo-brand-optional: #21b799;
+@odoo-brand-optional-disabled: #6ED0BC; // Specifically used for status bar status arrows
+@odoo-brand-primary: #a24689;
+@odoo-brand-secondary: #8f8f8f;
+@odoo-form-group-cols: 12;
+@odoo-horizontal-padding: 16px;
+@odoo-list-grey: #e2e2e0;  // FIXME: listview thead background color
+@odoo-main-color-muted: #a8a8a8;
+@odoo-main-text-color: #666666;
+@odoo-webclient-background-color: @odoo-brand-secondary;
+@odoo-view-background-color: red;
+@odoo-shadow-color: #303030;
+
+body {}
+
+.o_kanban_view {
+    background-color: #f0eeee;
+}
+
+.o_kanban_header {
+    color: black !important;
+}
+
+.o_kanban_config i, .o_kanban_quick_add i {
+    color: #555 !important;
+}
+
+
+.btn-icon {
+    .btn-default;
+}
