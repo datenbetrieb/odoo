@@ -21,9 +21,7 @@
 @odoo-view-background-color: red;
 @odoo-shadow-color: #303030;
 
-body {}
-
-.o_kanban_view {
+.o_kanban_view, .oe-view-manager {
     background-color: #f0eeee;
 }
 
@@ -33,9 +31,23 @@ body {}
 
 .o_kanban_config i, .o_kanban_quick_add i {
     color: #555 !important;
+    &:hover {
+        background-color: darken(#f0eeee, 10%) !important;
+    }
 }
 
+.o_column_folded {
+    color: white !important;
+}
 
 .btn-icon {
     .btn-default;
+}
+
+.openerp .oe_avatar {
+    float: left;
+}
+
+.openerp .oe_button_box {
+    float: right;
 }
