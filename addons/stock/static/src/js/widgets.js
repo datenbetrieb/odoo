@@ -8,7 +8,7 @@ var Model = require('web.Model');
 var session = require('web.session');
 var web_client = require('web.web_client');
 var Widget = require('web.Widget');
-var kanban_common = require('web_kanban.common');
+var KanbanRecord = require('web_kanban.Record');
 
 var _t     = core._t;
 var QWeb   = core.qweb;
@@ -1057,9 +1057,9 @@ var BarcodeScanner = core.Class.extend({
     },
 });
 
-kanban_common.KanbanRecord.include({
+KanbanRecord.include({
     on_card_clicked: function() {
-        if (this.view.dataset.model === 'stock.picking.type') {
+        if (this.model === 'stock.picking.type') {
             this.$('.oe_kanban_stock_picking_type_list').first().click();
         } else {
             this._super.apply(this, arguments);
