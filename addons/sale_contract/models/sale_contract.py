@@ -353,6 +353,21 @@ class account_analytic_account(osv.osv):
             res[account.id]['toinvoice_total'] =  self._get_total_toinvoice(account)
          return res
 
+    # removed from analytic, to put here
+    # template_id = fields.Many2one('account.analytic.account', 'Template of Contract')
+    # description = fields.Text('Description')
+    # user_id = fields.Many2one('res.users', 'Responsible', track_visibility='onchange')
+    # manager_id = fields.Many2one('res.users', 'Sales Rep', track_visibility='onchange')
+    #
+    # class res_partner(osv.osv):
+    #     """ Inherits partner and adds contract information in the partner form """
+    #     _inherit = 'res.partner'
+    # 
+    #     _columns = {
+    #         'contract_ids': fields.one2many('account.analytic.account', \
+    #                                                     'partner_id', 'Contracts', readonly=True),
+    #     }
+    # state = fields.Selection(ANALYTIC_ACCOUNT_STATE, 'Status', required=True, track_visibility='onchange', copy=False)
     _columns = {
         'ca_invoiced': fields.function(_ca_invoiced_calc, type='float', string='Invoiced Amount',
             help="Total customer invoiced amount for this account.",

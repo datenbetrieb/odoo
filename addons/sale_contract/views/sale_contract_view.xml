@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record model="ir.actions.act_window" id="action_sales_order">
-            <field name="name">Sales Orders</field>
-            <field name="res_model">sale.order</field>
-            <field name="src_model">account.analytic.account</field>
-            <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a quotation that can be converted into a sales
-                order.
-              </p><p>
-                Use sale orders to track everything that should be invoiced
-                at a fix price on a contract.
-              </p>
-            </field>
-        </record>
 
         <!-- Inherited Analytic Account form for contracts -->
         <record id="account_analytic_account_form_form" model="ir.ui.view">
