@@ -20,7 +20,6 @@ class account_analytic_account(models.Model):
     _name = 'account.analytic.account'
     _inherit = ['mail.thread']
     _description = 'Analytic Account'
-    _parent_store = 'parent_id'
     _order = 'code, name asc'
 
     @api.multi
@@ -44,7 +43,11 @@ class account_analytic_account(models.Model):
 
     @api.model
     def _default_company(self):
-        return self.env.user_id.company_id.id
+        return self.env.user.company_id.id
+
+    @api.model
+    def _default_user(self):
+        return self.env.user.id
 
     name = fields.Char(string='Analytic Account', index=True, required=True, track_visibility='onchange')
     code = fields.Char(string='Reference', index=True, track_visibility='onchange')
@@ -52,10 +55,11 @@ class account_analytic_account(models.Model):
             ('normal','Analytic View')
         ], string='Type of Account', required=True, default='normal')
 
-    tag_ids = fields.Many2many('account.analytic.tag', string='Tags', copy=True)
+    tag_ids = fields.Many2many('account.analytic.tag', 'account_analytic_account_tag_rel', 'account_id', 'tag_id', string='Tags', copy=True)
 
-    company_id = fields.Many2one('res.company', string='Company', required=True, default=_get_company)
+    company_id = fields.Many2one('res.company', string='Company', required=True, default=_default_company)
     partner_id = fields.Many2one('res.partner', string='Customer')
+    user_id = fields.Many2one('res.users', 'User', default=_default_user)
     date_start = fields.Date(string='Start Date', default=fields.Date.context_today)
     date_end = fields.Date(string='End Date', track_visibility='onchange')
 
@@ -67,10 +71,11 @@ class account_analytic_account(models.Model):
 
     @api.multi
     def name_get(self):
+        res = []
         for analytic in self:
             name = self.name
-            if self.parent_id:
-                name = self.parent_id.display_name + ' / ' + name
+            if self.code:
+                name = '['+self.code+'] '+name
             res.append((self.id, name))
         return res
 
@@ -99,7 +104,7 @@ class account_analytic_line(models.Model):
 
     @api.model
     def _default_user(self):
-        return self.env.user_id.id
+        return self.env.user.id
 
     name = fields.Char('Description', required=True)
     date = fields.Date('Date', required=True, index=True, default=fields.Date.context_today)
@@ -107,6 +112,10 @@ class account_analytic_line(models.Model):
     unit_amount = fields.Float('Quantity', default=0.0)
     account_id = fields.Many2one('account.analytic.account', 'Analytic Account', required=True, ondelete='restrict', index=True)
     user_id = fields.Many2one('res.users', 'User', default=_default_user)
-    company_id = fields.Many2one(related='account_id.company_id', string='Company', store=True, readonly=True)
     partner_id = fields.Many2one('res.partner', string='Partner')
+
+    tag_ids = fields.Many2many('account.analytic.tag', 'account_analytic_line_tag_rel', 'line_id', 'tag_id', string='Tags', copy=True)
+
+    company_id = fields.Many2one(related='account_id.company_id', string='Company', store=True, readonly=True)
+    currency_id = fields.Many2one(related="company_id.currency_id", string="Currency", readonly=True)
 

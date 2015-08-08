@@ -24,7 +24,7 @@
                             </group>
                             <group>
                                 <field name="code"/>
-                                <field name="parent_id"/>
+                                <field name="tag_ids"/>
                                 <field name="company_id"/>
                                 <field name="currency_id"/>
                             </group>
@@ -49,7 +49,6 @@
                     <field name="partner_id"/>
                     <field name="date_start"/>
                     <field name="user_id" invisible="1"/>
-                    <field name="parent_id" invisible="1"/>
                     <field name="account_type" invisible="1"/>
                     <field name="company_id" groups="base.group_multi_company"/>
                     <field name="debit"/>
@@ -66,12 +65,11 @@
                 <search string="Analytic Account">
                     <field name="name" filter_domain="['|', ('name','ilike',self), ('code','ilike',self)]" string="Analytic Account"/>
                     <field name="tag_ids"/>
-                    <field name="date"/>
+                    <field name="date_start"/>
                     <field name="partner_id"/>
                     <field name="user_id"/>
                     <group expand="0" string="Group By...">
                         <filter string="Associated Partner" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="Parent Account" domain="[]" context="{'group_by':'parent_id'}"/>
                     </group>
                 </search>
             </field>
@@ -84,8 +82,6 @@
             <field name="context">{}</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="view_account_analytic_account_tree"/>
-            <field name="search_view_id" ref="analytic.view_account_analytic_account_search"/>
         </record>
 
 
