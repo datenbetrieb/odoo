@@ -3,7 +3,6 @@
     <data noupdate="1">
         <record id="analytic.analytic_consultancy" model="account.analytic.account">
             <field name="partner_id" ref="base.res_partner_15"/>
-            <field name="invoice_on_timesheets">True</field>
             <field name="hours_qtt_est">1200</field>
             <field name="fix_price_invoices">True</field>
             <field name="to_invoice" ref="hr_timesheet_invoice.timesheet_invoice_factor1"/>
@@ -18,7 +17,6 @@
 
         <record id="analytic.analytic_super_product_trainings" model="account.analytic.account">
             <field name="partner_id" ref="base.res_partner_18"/>
-            <field name="invoice_on_timesheets">True</field>
             <field name="hours_qtt_est">500</field>
             <field name="fix_price_invoices">True</field>
             <field name="pricelist_id" ref="product.list0"/>
@@ -33,8 +31,7 @@
         </record>
 
         <record id="analytic.analytic_support_internal" model="account.analytic.account">
-        	<field name="partner_id" ref="base.res_partner_1"/>
-            <field name="invoice_on_timesheets">True</field>
+            <field name="partner_id" ref="base.res_partner_1"/>
             <field name="hours_qtt_est">100</field>
             <field name="pricelist_id" ref="product.list0"/>
             <field name="to_invoice" ref="hr_timesheet_invoice.timesheet_invoice_factor1"/>

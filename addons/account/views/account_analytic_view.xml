@@ -9,7 +9,6 @@
                 <data>
                     <xpath expr="//field[@name='account_id']" position="after">
                         <field name="general_account_id"/>
-                        <field name="journal_id"/>
                         <field name="ref"/>
                         <field name="partner_id"/>
                         <field name="move_id" readonly="1"/>

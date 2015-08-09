@@ -31,11 +31,6 @@
                             <field name="invoice_id" readonly="1"/>
                         </group>
                     </xpath>
-                    <field name="account_id" position="attributes">
-                        <attribute name="domain">[('type','in',['normal','contract']),('state', '!=', 'close'),('invoice_on_timesheets','=',1)]</attribute>
-                        <attribute name="on_change">on_change_account_id(account_id, user_id, unit_amount, is_timesheet, context)</attribute>
-                        <attribute name="context">{'default_invoice_on_timesheets': 1}</attribute>
-                    </field>
                 </field>
             </record>
 
@@ -49,9 +44,8 @@
                         <field name="invoice_id" readonly="1"/>
                     </field>
                     <field name="account_id" position="attributes">
-                        <attribute name="domain">[('type','in',['normal','contract']),('state', '!=', 'close'),('invoice_on_timesheets','=',1)]</attribute>
+                        <attribute name="domain">[('type','in',['normal','contract']),('state', '!=', 'close')]</attribute>
                         <attribute name="on_change">on_change_account_id(account_id, user_id, unit_amount, is_timesheet, context)</attribute>
-                        <attribute name="context">{'default_invoice_on_timesheets': 1}</attribute>
                     </field>
                 </field>
             </record>
@@ -127,8 +121,5 @@
     id="hr_timesheet_invoice_factor_view"
     parent="account.menu_analytic_accounting" sequence="99" groups="base.group_no_one"/>
 
-        <record id="hr_timesheet.act_hr_timesheet_accounts_form" model="ir.actions.act_window">
-            <field name="context">{'invoice_on_timesheets':1, 'default_type': 'contract'}</field>
-        </record>
     </data>
 </openerp>

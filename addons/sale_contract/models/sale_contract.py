@@ -144,7 +144,6 @@ class account_analytic_account(osv.osv):
             res['value']['fix_price_invoices'] = template.fix_price_invoices
             res['value']['amount_max'] = template.amount_max
         if not ids:
-            res['value']['invoice_on_timesheets'] = template.invoice_on_timesheets
             res['value']['hours_qtt_est'] = template.hours_qtt_est
         
         if template.to_invoice.id:

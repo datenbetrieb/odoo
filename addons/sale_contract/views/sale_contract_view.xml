@@ -15,18 +15,8 @@
                         <button name="set_open" string="Set to Active" type="object" states="close" />
                     </header>
                 </xpath>
-                <xpath expr='//field[@name="partner_id"]' position='after'>
-                    <field name="pricelist_id"
-                           class="oe_inline"
-                           attrs="{'required': ['|',('invoice_on_timesheets', '=', True),('contract_type','=','subscription')], 'invisible': [('contract_type','=','prepaid')]}"
-                           domain="[('type', '=', 'sale')]"
-                           groups="product.group_sale_pricelist"/>
-                </xpath>
                 <xpath expr='//div[@name="duration"]' position='after'>
                     <field name="close_reason_id" attrs="{'invisible': ['|',('type','!=','contract'),('state','in',['open','pending'])]}"/>
-                    <field name="to_invoice"
-                            widget="selection"
-                            attrs="{'required': [('invoice_on_timesheets', '=', True)], 'invisible': [('invoice_on_timesheets','=',False)]}"/>
                 </xpath>
                 <notebook position="inside">
                     <page id="recurring_lines" string="Subscription" attrs="{'invisible': ['|',('contract_type','!=','subscription'),('type','in',['view','normal'])]}">
@@ -56,9 +46,6 @@
                         </div>
                     </page>
                 </notebook>
-               <field name="partner_id" position="attributes">
-                    <attribute name="attrs">{'invisible': [('type','in',['view','normal','template'])], 'required': [('type','=','contract'),'|',('fix_price_invoices','=',True), ('invoice_on_timesheets', '=', True)]}</attribute>
-                </field>
                 <xpath expr='//field[@name="contract_type"]' position='after'>
                     <label for="recurring_interval" string="Contract Duration" attrs="{'invisible': [('type','!=','template')]}"/>
                     <div attrs="{'invisible': [('type','!=','template')]}">

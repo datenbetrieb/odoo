@@ -256,11 +256,9 @@ var WeeklyTimesheet = form_common.FormWidget.extend(form_common.ReinitializeWidg
                 domain: [
                     ['type','in',['normal', 'contract']],
                     ['state', '<>', 'close'],
-                    ['invoice_on_timesheets','=',1],
                     ['id', 'not in', _.pluck(self.accounts, "account")],
                 ],
                 context: {
-                    default_invoice_on_timesheets: 1,
                     default_type: "contract",
                 },
                 modifiers: '{"required": true}',

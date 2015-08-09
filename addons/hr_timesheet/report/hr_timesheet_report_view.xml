@@ -37,7 +37,6 @@
                     <group expand="0" string="Extended Filters...">
                         <field name="general_account_id"/>
                         <field name="product_id"/>
-                        <field name="journal_id"/>
                         <field name="company_id" groups="base.group_multi_company"/>
                         <field name="date"/>
                     </group>
