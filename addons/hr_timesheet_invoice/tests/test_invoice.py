@@ -14,7 +14,6 @@ class TestInvoice(AccountingTestCase):
         self.product_product = self.registry('product.product')
 
         self.think_big_id = self.registry("ir.model.data").get_object_reference(cr, uid, "base", "res_partner_18")[1]
-        self.timesheet_journal_id = self.registry("ir.model.data").get_object_reference(cr, uid, "hr_timesheet", "analytic_journal")[1]
         self.expense_journal_id = self.registry("ir.model.data").get_object_reference(cr, uid, 'account', 'exp')[1]
         user_type_id = self.ref('account.data_account_type_expenses')
         self.expense_account_id = self.env['account.account'].create({'code': 'X2120', 'name': 'Test Expense Account', 'user_type_id': user_type_id}).id

@@ -204,7 +204,6 @@
                                     <field name="costs_hour_account_id" groups="analytic.group_analytic_accounting"/>
                                     <field name="costs_cycle"/>
                                     <field name="costs_cycle_account_id" groups="analytic.group_analytic_accounting"/>
-                                    <field name="costs_journal_id" attrs="{'required':['|',('costs_hour_account_id', '=', True),('costs_cycle_account_id', '=', True)]}" groups="analytic.group_analytic_accounting"/>
                                     <field name="costs_general_account_id" attrs="{ 'required':['|',('costs_cycle_account_id', '=', True),('costs_hour_account_id', '=', True)]}" groups="analytic.group_analytic_accounting"/>
                                 </group>
                             </group>

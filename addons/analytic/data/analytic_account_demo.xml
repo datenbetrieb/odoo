@@ -27,8 +27,6 @@
         <record id="analytic_integration_c2c" model="account.analytic.account">
             <field name="name">CampToCamp</field>
             <field name="account_type">normal</field>
-            <field eval="str(time.localtime()[0] - 1) + '-08-07'" name="date_start"/>
-            <field eval="time.strftime('%Y-12-31')" name="date_end"/>
             <field name="partner_id" ref="base.res_partner_12"/>
             <field name="tag_ids" eval="[(6,0, (ref('analytic.tag_contract'),))]"/>
         </record>
@@ -49,29 +47,21 @@
         </record>
         <record id="analytic_spark" model="account.analytic.account">
             <field name="name">Spark Systems</field>
-            <field eval="str(time.localtime()[0] - 1) + '-05-09'" name="date_start"/>
-            <field eval="time.strftime('%Y-05-08')" name="date_end"/>
             <field name="account_type">normal</field>
             <field name="partner_id" ref="base.res_partner_16"/>
         </record>
         <record id="analytic_nebula" model="account.analytic.account">
             <field name="name">Nebula</field>
-            <field eval="time.strftime('%Y-02-01')" name="date_start"/>
-            <field eval="time.strftime('%Y-07-01')" name="date_end"/>
             <field name="account_type">normal</field>
             <field name="partner_id" ref="base.res_partner_17"/>
         </record>
         <record id="analytic_luminous_technologies" model="account.analytic.account">
             <field name="name">Luminous Technologies</field>
-            <field eval="time.strftime('%Y-04-24')" name="date_start"/>
-            <field eval="str(time.localtime()[0] + 1) + '-04-24'" name="date_end"/>
             <field name="account_type">normal</field>
             <field name="partner_id" ref="base.res_partner_11"/>
         </record>
         <record id="analytic_desertic_hispafuentes" model="account.analytic.account">
             <field name="name">Desertic - Hispafuentes</field>
-            <field eval="time.strftime('%Y-02-01')" name="date_start"/>
-            <field eval="str(time.localtime()[0] + 1) + '-02-01'" name="date_end"/>
             <field name="account_type">normal</field>
             <field name="partner_id" ref="base.res_partner_12"/>
         </record>
@@ -82,8 +72,6 @@
         </record>
         <record id="analytic_partners_camp_to_camp" model="account.analytic.account">
             <field name="name">Camp to Camp</field>
-            <field eval="time.strftime('%Y-%m-%d', time.localtime(time.time() - 365 * 86400))" name="date_start"/>
-            <field eval="time.strftime('%Y-%m-%d')" name="date_end"/>
             <field name="account_type">normal</field>
             <field name="partner_id" ref="base.res_partner_12"/>
         </record>

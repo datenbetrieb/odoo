@@ -7,7 +7,6 @@
     account_id: analytic.analytic_agrolait
     amount: -1.0
     general_account_id: a_expense
-    journal_id: hr_timesheet.analytic_journal
     name: develop yaml for hr module
     product_id: product.product_product_1
     product_uom_id: product.product_uom_hour

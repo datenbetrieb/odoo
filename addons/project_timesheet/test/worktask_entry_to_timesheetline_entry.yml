@@ -22,13 +22,6 @@
     weight: 0.0
     weight_net: 0.0
 -
-  Create an analytic journal for employees timesheet
--
-  !record {model: account.analytic.journal, id: account_analytic_journal_hrtimesheet0}:
-    company_id: base.main_company
-    name: HR Timesheet
-    type: general
--
   Create a financial account
 -
   !record {model: account.account, id: financial_account0}:
@@ -42,7 +35,6 @@
     name: HR Manager
     user_id: res_users_hrmanager0
     product_id: product_product_hrmanger0
-    journal_id: account_analytic_journal_hrtimesheet0
 -
   Create a project 'Timesheet Management'
 -
@@ -69,5 +61,4 @@
         name: Get work calendar of all employees
         user_id: res_users_hrmanager0
         account_id: analytic.analytic_administratif
-        journal_id: account_analytic_journal_hrtimesheet0
         general_account_id: financial_account0

@@ -69,16 +69,6 @@ class AccountInvoice(models.Model):
         return journal.currency_id or journal.company_id.currency_id
 
     @api.model
-    @api.returns('account.analytic.journal', lambda r: r.id)
-    def _get_journal_analytic(self, inv_type):
-        """ Return the analytic journal corresponding to the given invoice type. """
-        journal_type = TYPE2JOURNAL.get(inv_type, 'sale')
-        journal = self.env['account.analytic.journal'].search([('type', '=', journal_type)], limit=1)
-        if not journal:
-            raise UserError(_("You must define an analytic journal of type '%s'!") % (journal_type,))
-        return journal
-
-    @api.model
     def _get_reference_type(self):
         return [('none', _('Free Reference'))]
 
@@ -958,8 +948,6 @@ class AccountInvoiceLine(models.Model):
     @api.multi
     def _get_analytic_line(self):
         ref = self.invoice_id.number
-        if not self.invoice_id.journal_id.analytic_journal_id:
-            raise UserError(_("No Analytic Journal! You have to define an analytic journal on the '%s' journal!") % (self.invoice_id.journal_id.name,))
         return {
             'name': self.name,
             'date': self.invoice_id.date_invoice,
@@ -969,7 +957,6 @@ class AccountInvoiceLine(models.Model):
             'product_id': self.product_id.id,
             'product_uom_id': self.uom_id.id,
             'general_account_id': self.account_id.id,
-            'journal_id': self.invoice_id.journal_id.analytic_journal_id.id,
             'ref': ref,
         }
 

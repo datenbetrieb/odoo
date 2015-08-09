@@ -63,7 +63,6 @@ class mrp_workcenter(osv.osv):
         'costs_cycle': fields.float('Cost per cycle', help="Specify Cost of Work Center per cycle."),
         'costs_cycle_account_id': fields.many2one('account.analytic.account', 'Cycle Account', domain=[('type','!=','view')],
             help="Fill this only if you want automatic analytic accounting entries on production orders."),
-        'costs_journal_id': fields.many2one('account.analytic.journal', 'Analytic Journal'),
         'costs_general_account_id': fields.many2one('account.account', 'General Account', domain=[('deprecated', '=', False)]),
         'resource_id': fields.many2one('resource.resource','Resource', ondelete='cascade', required=True),
         'product_id': fields.many2one('product.product','Work Center Product', help="Fill this product to easily track your production costs in the analytic accounting."),
@@ -1040,7 +1039,7 @@ class mrp_production(osv.osv):
         analytic_line_obj = self.pool.get('account.analytic.line')
         for wc_line in production.workcenter_lines:
             wc = wc_line.workcenter_id
-            if wc.costs_journal_id and wc.costs_general_account_id:
+            if wc.costs_general_account_id:
                 # Cost per hour
                 value = wc_line.hour * wc.costs_hour
                 account = wc.costs_hour_account_id.id
@@ -1054,7 +1053,6 @@ class mrp_production(osv.osv):
                         'amount': value,
                         'account_id': account,
                         'general_account_id': wc.costs_general_account_id.id,
-                        'journal_id': wc.costs_journal_id.id,
                         'ref': wc.code,
                         'product_id': wc.product_id.id,
                         'unit_amount': wc_line.hour,
@@ -1070,7 +1068,6 @@ class mrp_production(osv.osv):
                         'amount': value,
                         'account_id': account,
                         'general_account_id': wc.costs_general_account_id.id,
-                        'journal_id': wc.costs_journal_id.id,
                         'ref': wc.code,
                         'product_id': wc.product_id.id,
                         'unit_amount': wc_line.cycle,

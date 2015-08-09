@@ -175,7 +175,7 @@
         accounts = [wc.costs_hour_account_id, wc.costs_cycle_account_id]
         cost_per_cyle = wc_line.cycle * wc.costs_cycle
         cost_per_hours = wc_line.hour * wc.costs_hour
-        if accounts and wc.costs_journal_id and wc.costs_general_account_id and (cost_per_cyle or cost_per_hours):
+        if accounts and wc.costs_general_account_id and (cost_per_cyle or cost_per_hours):
             line_ids = account_analytic_line.search(cr, uid, [('name','ilike',wc_line.name)])
             assert line_ids, 'Costs lines are not generated.'
             for line in account_analytic_line.browse(cr, uid, line_ids, context=context):
@@ -188,6 +188,5 @@
                 else:
                     raise AssertionError('unknown cost line: %s' % line)
                 assert line.general_account_id.id == wc.costs_general_account_id.id, "General Account is not correspond."
-                assert line.journal_id.id == wc.costs_journal_id.id, "Account Journal is not correspond."
                 assert line.product_id.id == wc.product_id.id, "Product does not correspond."
                 assert line.product_uom_id.id == wc.product_id.uom_id.id, "UOM does not correspond."

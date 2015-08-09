@@ -224,7 +224,6 @@ class AccountJournal(models.Model):
     company_id = fields.Many2one('res.company', string='Company', required=True, index=1, default=lambda self: self.env.user.company_id,
         help="Company related to this journal")
 
-    analytic_journal_id = fields.Many2one('account.analytic.journal', string='Analytic Journal', help="Journal for analytic entries")
     refund_sequence = fields.Boolean(string='Dedicated Refund Sequence', help="Check this box if you don't want to share the same sequence for invoices and refunds made from this journal")
 
     inbound_payment_method_ids = fields.Many2many('account.payment.method', 'account_journal_inbound_payment_method_rel', 'journal_id', 'inbound_payment_method',
@@ -379,7 +378,6 @@ class AccountJournal(models.Model):
                 'code': journal_code,
                 'type': line.get('account_type', 'bank'),
                 'company_id': company.id,
-                'analytic_journal_id': False,
                 'currency_id': line.get('currency_id', False),
                 'show_on_dashboard': True,
         }

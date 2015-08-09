@@ -32,7 +32,6 @@ class account_analytic_line(osv.osv):
         'product_id': fields.many2one('product.product', 'Product'),
         'general_account_id': fields.many2one('account.account', 'Financial Account', required=True, ondelete='restrict'),
         'move_id': fields.many2one('account.move.line', 'Move Line', ondelete='cascade', select=True),
-        'journal_id': fields.many2one('account.analytic.journal', 'Analytic Journal', required=True, ondelete='restrict', select=True),
         'code': fields.char('Code', size=8),
         'ref': fields.char('Ref.'),
         'currency_id': fields.related('move_id', 'currency_id', type='many2one', relation='res.currency', string='Account Currency', store=True, help="The related account currency if not equal to the company one.", readonly=True),
@@ -60,83 +59,6 @@ class account_analytic_line(osv.osv):
             if l.move_id and not l.account_id.company_id.id == l.move_id.account_id.company_id.id:
                 return False
         return True
-
-    # Compute the cost based on the price type define into company
-    # property_valuation_price_type property
-    def on_change_unit_amount(self, cr, uid, id, prod_id, quantity, company_id,
-            unit=False, journal_id=False, context=None):
-        if context==None:
-            context={}
-        if not journal_id:
-            j_ids = self.pool.get('account.analytic.journal').search(cr, uid, [('type','=','purchase')])
-            journal_id = j_ids and j_ids[0] or False
-        if not journal_id or not prod_id:
-            return {}
-        product_obj = self.pool.get('product.product')
-        analytic_journal_obj =self.pool.get('account.analytic.journal')
-        product_price_type_obj = self.pool.get('product.price.type')
-        product_uom_obj = self.pool.get('product.uom')
-        j_id = analytic_journal_obj.browse(cr, uid, journal_id, context=context)
-        prod = product_obj.browse(cr, uid, prod_id, context=context)
-        result = 0.0
-        if prod_id:
-            unit_obj = False
-            if unit:
-                unit_obj = product_uom_obj.browse(cr, uid, unit, context=context)
-            if not unit_obj or prod.uom_id.category_id.id != unit_obj.category_id.id:
-                unit = prod.uom_id.id
-            if j_id.type == 'purchase':
-                if not unit_obj or prod.uom_po_id.category_id.id != unit_obj.category_id.id:
-                    unit = prod.uom_po_id.id
-        if j_id.type <> 'sale':
-            a = prod.property_account_expense.id
-            if not a:
-                a = prod.categ_id.property_account_expense_categ.id
-            if not a:
-                raise UserError(
-                        _('There is no expense account defined ' \
-                                'for this product: "%s" (id:%d).') % \
-                                (prod.name, prod.id,))
-        else:
-            a = prod.property_account_income.id
-            if not a:
-                a = prod.categ_id.property_account_income_categ.id
-            if not a:
-                raise UserError(
-                        _('There is no income account defined ' \
-                                'for this product: "%s" (id:%d).') % \
-                                (prod.name, prod_id,))
-
-        flag = False
-        # Compute based on pricetype
-        product_price_type_ids = product_price_type_obj.search(cr, uid, [('field','=','standard_price')], context=context)
-        pricetype = product_price_type_obj.browse(cr, uid, product_price_type_ids, context=context)[0]
-        if journal_id:
-            journal = analytic_journal_obj.browse(cr, uid, journal_id, context=context)
-            if journal.type == 'sale':
-                product_price_type_ids = product_price_type_obj.search(cr, uid, [('field','=','list_price')], context=context)
-                if product_price_type_ids:
-                    pricetype = product_price_type_obj.browse(cr, uid, product_price_type_ids, context=context)[0]
-        # Take the company currency as the reference one
-        if pricetype.field == 'list_price':
-            flag = True
-        ctx = context.copy()
-        if unit:
-            # price_get() will respect a 'uom' in its context, in order
-            # to return a default price for those units
-            ctx['uom'] = unit
-        amount_unit = prod.price_get(pricetype.field, context=ctx)[prod.id]
-        prec = self.pool.get('decimal.precision').precision_get(cr, uid, 'Account')
-        amount = amount_unit * quantity or 0.0
-        result = round(amount, prec)
-        if not flag:
-            result *= -1
-        return {'value': {
-            'amount': result,
-            'general_account_id': a,
-            'product_uom_id': unit
-            }
-        }
 
     def view_header_get(self, cr, user, view_id, view_type, context=None):
         if context is None:

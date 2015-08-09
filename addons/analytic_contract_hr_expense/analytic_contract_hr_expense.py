@@ -49,9 +49,7 @@ class account_analytic_account(osv.osv):
             cr.execute("""
                 SELECT product_id, sum(amount), user_id, to_invoice, sum(unit_amount), product_uom_id, line.name
                 FROM account_analytic_line line
-                    LEFT JOIN account_analytic_journal journal ON (journal.id = line.journal_id)
                 WHERE account_id = %s
-                    AND journal.type = 'purchase'
                     AND invoice_id IS NULL
                     AND to_invoice IS NOT NULL
                 GROUP BY product_id, user_id, to_invoice, product_uom_id, line.name""", (account.id,))

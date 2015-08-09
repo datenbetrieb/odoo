@@ -59,9 +59,6 @@ class account_analytic_account(models.Model):
 
     company_id = fields.Many2one('res.company', string='Company', required=True, default=_default_company)
     partner_id = fields.Many2one('res.partner', string='Customer')
-    user_id = fields.Many2one('res.users', 'User', default=_default_user)
-    date_start = fields.Date(string='Start Date', default=fields.Date.context_today)
-    date_end = fields.Date(string='End Date', track_visibility='onchange')
 
     balance = fields.Monetary(compute='_debit_credit_compute', string='Balance')
     debit = fields.Monetary(compute='_debit_credit_compute', string='Debit')
@@ -102,16 +99,11 @@ class account_analytic_line(models.Model):
     _description = 'Analytic Line'
     _order = 'date desc'
 
-    @api.model
-    def _default_user(self):
-        return self.env.user.id
-
     name = fields.Char('Description', required=True)
     date = fields.Date('Date', required=True, index=True, default=fields.Date.context_today)
     amount = fields.Monetary('Amount', required=True, default=0.0)
     unit_amount = fields.Float('Quantity', default=0.0)
     account_id = fields.Many2one('account.analytic.account', 'Analytic Account', required=True, ondelete='restrict', index=True)
-    user_id = fields.Many2one('res.users', 'User', default=_default_user)
     partner_id = fields.Many2one('res.partner', string='Partner')
 
     tag_ids = fields.Many2many('account.analytic.tag', 'account_analytic_line_tag_rel', 'line_id', 'tag_id', string='Tags', copy=True)

@@ -13,7 +13,6 @@ class account_analytic_profit(osv.osv_memory):
     _columns = {
         'date_from': fields.date('From', required=True),
         'date_to': fields.date('To', required=True),
-        'journal_ids': fields.many2many('account.analytic.journal', 'analytic_profit_journal_rel', 'analytic_id', 'journal_id', 'Journal', required=True),
         'employee_ids': fields.many2many('res.users', 'analytic_profit_emp_rel', 'analytic_id', 'emp_id', 'User', required=True),
     }
 
@@ -35,13 +34,11 @@ class account_analytic_profit(osv.osv_memory):
         ids_chk = line_obj.search(cr, uid, [
                 ('date', '>=', data['form']['date_from']),
                 ('date', '<=', data['form']['date_to']),
-                ('journal_id', 'in', data['form']['journal_ids']),
                 ('user_id', 'in', data['form']['employee_ids']),
                 ], context=context)
         if not ids_chk:
             raise UserError(_('No record(s) found for this report.'))
 
-        data['form']['journal_ids'] = [(6, 0, data['form']['journal_ids'])] # Improve me => Change the rml/sxw so that it can support withou [0][2]
         data['form']['employee_ids'] = [(6, 0, data['form']['employee_ids'])]
         datas = {
             'ids': [],

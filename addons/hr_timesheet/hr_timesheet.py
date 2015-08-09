@@ -9,13 +9,7 @@ from openerp.tools.translate import _
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
-    @api.model
-    def _get_default_analytic_journal(self):
-        # We need the "or ..." because we need an empty recordset of the right type, 'False' is not enough.
-        return self.env.ref('hr_timesheet.analytic_journal', raise_if_not_found=False) or self.env['account.analytic.journal']
-
     product_id = fields.Many2one('product.product', 'Product', help="If you want to reinvoice working time of employees, link this employee to a service to determinate the cost price of the job.")
-    journal_id = fields.Many2one('account.analytic.journal', 'Analytic Journal', default=_get_default_analytic_journal)
     uom_id = fields.Many2one('product.uom', related='product_id.uom_id', string='Unit of Measure', store=True, readonly=True)
 
 
@@ -31,8 +25,6 @@ class account_analytic_line(models.Model):
                 values['product_uom_id'] = self._get_employee_unit(cr, uid, context=context)
             if 'general_account_id' in fields:
                 values['general_account_id'] = self._get_general_account(cr, uid, context=context)
-            if 'journal_id' in fields:
-                values['journal_id'] = self._get_analytic_journal(cr, uid, context=context)
         return values
 
     is_timesheet = fields.Boolean()
@@ -61,19 +53,6 @@ class account_analytic_line(models.Model):
         else:
             return None
 
-    @api.model
-    def _get_analytic_journal(self, user_id=None):
-        emp = self.env['hr.employee'].search([('user_id', '=', user_id or self.env.uid)], limit=1)
-        if emp and emp.journal_id.id:
-            return emp.journal_id.id
-        else:
-            journal = self.env['account.analytic.journal'].search([('type', '=', 'general')], limit=1)
-
-            if journal:
-                return journal.id
-            else:
-                return None
-
     @api.onchange('user_id')
     def V8_on_change_user_id(self):
         new_values = self.on_change_user_id(self.user_id.id, self.is_timesheet)
@@ -85,7 +64,6 @@ class account_analytic_line(models.Model):
         if not is_timesheet or not user_id:
             return {}
         res = {"value": {
-            'journal_id': self._get_analytic_journal(cr, uid, user_id, context=context),
             'product_id': self._get_employee_product(cr, uid, user_id, context=context),
             'uom_id': self._get_employee_unit(cr, uid, user_id, context=context),
             'general_account_id': self._get_general_account(cr, uid, user_id, context=context)

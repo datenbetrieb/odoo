@@ -18,21 +18,6 @@
     type: 'normal'
     parent_id: analytic_account_view1
 -
-  We add analytic lines in real accounts and journal
--
-  !record {model: account.analytic.journal, id: analytic_journal1}:
-    name: 'Analytic journal'
--
-  !record {model: account.analytic.line, id: analytic_line1}:
-    name: 'Analytic line 1'
-    account_id: analytic_account1
-    journal_id: analytic_journal1
--
-  !record {model: account.analytic.line, id: analytic_line2}:
-    name: 'Analytic line 2'
-    account_id: analytic_account2
-    journal_id: analytic_journal1
--
   Now we copy the toplevel account
 -
   !function {model: account.analytic.account, name: copy, id: analytic_account_view1}:

@@ -11,7 +11,6 @@ class account_analytic_profit(report_sxw.rml_parse):
         self.localcontext.update({
             'lines': self._lines,
             'user_ids': self._user_ids,
-            'journal_ids': self._journal_ids,
             'line': self._line,
         })
 
