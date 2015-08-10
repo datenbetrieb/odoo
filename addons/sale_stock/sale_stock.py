@@ -56,7 +56,7 @@ class SaleOrder(models.Model):
     @api.onchange('warehouse_id')
     def onchange_warehouse_id(self):
         if self.warehouse_id.company_id:
-            self.company_id = warehouse.company_id.id
+            self.company_id = self.warehouse.company_id.id
 
     def action_view_delivery(self, cr, uid, ids, context=None):
         '''

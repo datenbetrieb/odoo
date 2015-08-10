@@ -27,10 +27,10 @@ class AccountAnalyticLine(models.Model):
             if line.is_timesheet:
                 if not line.so_line:
                     sol = sol_obj.search([
-                        ('order_id.project_id','=',result.account_id.id),
+                        ('order_id.project_id','=',line.account_id.id),
                         ('state','=','sale'),
                         ('product_id.is_timesheet','=',True),
-                        ('product_id.type','=','service'])
+                        ('product_id.type','=','service')])
                     if sol:
                         line.so_line = sol[0]
                         sol = sol[0]
@@ -46,8 +46,8 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     @api.one
-    @api.constrains('order_line.product_id')
-    def _check_children_scope(self):
+    @api.constrains('order_line')
+    def _check_multi_timesheet(self):
         count = 0
         for line in self.order_line:
             if line.product_id.is_timesheet:
