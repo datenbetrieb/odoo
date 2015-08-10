@@ -38,10 +38,10 @@ class SaleAdvancePaymentInv(models.TransientModel):
             ('percentage','Percentage'), 
             ('fixed','Fixed price (deposit)')
         ], string='What do you want to invoice?', default=_get_advance_payment_method, required=True)
-    product_id = fields.Many2one('product.product', string='Advance Product',
+    product_id = fields.Many2one('product.product', string='Deposit Product',
         domain=[('type', '=', 'service')], default=_get_advance_product)
     count = fields.Integer(compute=_count, string='# of Orders')
-    amount = fields.Float('Advance Amount', digits=(16,2),
+    amount = fields.Float('Deposit Amount', digits=(16,2),
         help="The amount to be invoiced in advance, taxes excluded.")
 
     def _translate_advance(self):
@@ -81,7 +81,6 @@ class SaleAdvancePaymentInv(models.TransientModel):
             amount = self.amount
             name = _('Advance')
 
-        print 'SALE LINE IDS', [(6,0, [so_line.id])]
         invoice = inv_obj.create({
             'name': order.client_order_ref or order.name,
             'origin': order.name,
@@ -113,7 +112,6 @@ class SaleAdvancePaymentInv(models.TransientModel):
     @api.one
     def create_invoices(self):
         sale_obj = self.env['sale.order']
-        print 'CTX', self._context.get('active_ids', [])
         orders = sale_obj.browse(self._context.get('active_ids', []))
         inv_ids = []
         if self.advance_payment_method == 'delivered':
@@ -121,14 +119,16 @@ class SaleAdvancePaymentInv(models.TransientModel):
         elif self.advance_payment_method == 'all':
             inv_ids = orders.action_invoice_create(final=True)
         else:
-            print 'ICI'
             sale_line_obj = self.env['sale.order.line']
-            print orders, len(orders)
             for order in orders:
                 if self.advance_payment_method == 'percentage':
                     amount = order.amount_untaxed * self.amount / 100
                 else:
                     amount = self.amount
+                if self.product_id.invoice_policy <> 'order':
+                    raise UserError(_('The product used to invoice a deposit should have an invoice policy set to "Ordered quantities". Please update your deposit product to be able to create a deposit invoice.'))
+                if self.product_id.type <> 'service':
+                    raise UserError(_("The product used to invoice an deposit should be of type 'Service'. Please use another product or update this product."))
                 so_line = sale_line_obj.create({
                     'name': _('Advance: %s') % (time.strftime('%m %Y'),),
                     'price_unit': amount,
@@ -140,9 +140,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
                     'tax_id': self.product_id.taxes_id,
                 })
                 invoice = self._create_invoice(order, so_line, amount)
-                print '2'
                 inv_ids.append(invoice.id)
-        print self._context
         if self._context.get('open_invoices', False):
             return self.open_invoices(inv_ids)
         return {'type': 'ir.actions.act_window_close'}

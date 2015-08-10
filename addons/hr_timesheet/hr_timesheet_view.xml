@@ -13,10 +13,6 @@
                     <field name="name"/>
                     <field name="account_id" context="{'default_use_timesheets': 1, 'default_type': 'contract'}" options="{'no_open': True, 'no_create': True}"/>
                     <field name="unit_amount" string="Duration" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id)" sum="Total time" widget="float_time"/>
-                    <field name="product_uom_id" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id)" invisible="1"/>
-                    <field name="amount" sum="Total cost" invisible="1"/>
-                    <field name="general_account_id" invisible="1"/>
-                    <field name="product_id" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id)" domain="[('type','=','service')]" invisible="1"/>
                     <field name="is_timesheet" invisible="1"/>
                 </tree>
             </field>
@@ -52,7 +48,6 @@
                             <group name="accounting" string="Accounting">
                                 <field domain="[('type','=','normal'),('state', '&lt;&gt;', 'close'),('parent_id','!=',False)]" name="account_id" select="1" options="{'no_open': True, 'no_create': True}"/>
                                 <field name="amount"/>
-                                <field name="general_account_id"/>
                             </group>
                         </group>
                         </page>
@@ -157,19 +152,6 @@
         </record>
 
         <menuitem id="menu_hr_working_hours" parent="hr_attendance.menu_hr_time_tracking" action="act_hr_timesheet_line_evry1_all_form"/>
-
-        <record id="hr_timesheet_employee_extd_form" model="ir.ui.view">
-            <field name="name">hr.timesheet.employee.extd_form</field>
-            <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="hr.view_employee_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//group[@name='active_group']" position="before">
-                    <group string="Timesheets">
-                        <field name="product_id" domain="[('type','=','service')]"/>
-                    </group>
-                </xpath>
-            </field>
-        </record>
 
     </data>
 </openerp>

@@ -732,8 +732,8 @@ class product_template(models.Model):
     invoice_policy = fields.Selection([
             ('order', 'Ordered quantities'),
             ('delivery', 'Delivered quantities'),
-            ('time material', 'Time and material based'),
-            ('expense', 'At cost (e.g. expenses)'),
+            ('time material', 'Based on time and material'),
+            ('expense', 'Reinvoice at cost (e.g. expenses)'),
         ], string='Invoicing Policy', default='order')
 
 

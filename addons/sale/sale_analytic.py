@@ -29,7 +29,7 @@ class AccountAnalyticLine(models.Model):
     @api.model
     def create(self, values):
         line = super(AccountAnalyticLine, self).create(values)
-        if line.amount >= 0:
+        if (line.amount >= 0) or not line.product_id:
             return line
         if line.product_id.invoice_policy not in ('time material','expense','ordered'):
             return line

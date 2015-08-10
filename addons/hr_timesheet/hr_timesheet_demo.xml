@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data noupdate="1">
+
+        <record id="product.product_product_2" model="product.product">
+            <field name="name">Support Services (on timesheet)</field>
+        </record>
         <record id="hr.employee_fp" model="hr.employee">
-            <field name="product_id" ref="product.product_product_1"/>
+            <field name="product_id" ref="product.product_product_2"/>
         </record>
         <record id="hr.employee_qdp" model="hr.employee">
-            <field name="product_id" ref="product.product_product_1"/>
+            <field name="product_id" ref="product.product_product_2"/>
         </record>
     </data>
 </openerp>
