@@ -120,17 +120,6 @@ class SaleOrderLine(models.Model):
             return super(SaleOrderLine, self)._get_delivered_updateable()
         self.qty_delivered_updateable = False
 
-    @api.one
-    @api.depends('procurement_ids.state')
-    def _get_delivered_qty(self):
-        if self.product_id.type not in ('consu','product'):
-            return super(SaleOrderLine, self)._get_delivered_qty()
-        qty = 0
-        for proc in self.procurement_ids:
-            if proc.state in ('done',):
-                qty += proc.product_qty
-        self.qty_delivered = qty
-
     @api.onchange('product_packaging')
     def product_packaging_change(self):
         if self.product_packaging:

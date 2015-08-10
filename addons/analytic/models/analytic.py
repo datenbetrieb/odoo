@@ -111,6 +111,8 @@ class account_analytic_line(models.Model):
     account_id = fields.Many2one('account.analytic.account', 'Analytic Account', required=True, ondelete='restrict', index=True)
     partner_id = fields.Many2one('res.partner', string='Partner')
     user_id = fields.Many2one('res.users', string='User', default=_default_user)
+    product_id = fields.Many2one('product.product', string='Product')
+    product_uom_id = fields.Many2one('product.uom', string='UoM')
 
     tag_ids = fields.Many2many('account.analytic.tag', 'account_analytic_line_tag_rel', 'line_id', 'tag_id', string='Tags', copy=True)
 

@@ -13,9 +13,12 @@ import openerp.addons.decimal_precision as dp
 
 from openerp.exceptions import UserError
 
+
+
 class res_company(models.Model):
     _inherit = "res.company"
     sale_note = fields.Text(string='Default Terms and Conditions', translate=True)
+
 
 class SaleOrder(models.Model):
     _name = "sale.order"
@@ -101,10 +104,6 @@ class SaleOrder(models.Model):
 
     order_line = fields.One2many('sale.order.line', 'order_id', string='Order Lines', states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True)
 
-    invoice_policy = fields.Selection([
-        ('order', 'Ordered Quantities'),
-        ('delivery', 'Delivered Quantities'),
-    ], string='Invoice Policy', default='order')
     invoice_count = fields.Integer(string='# of Invoices', compute='_get_invoiced', store=True, readonly=True)
     invoice_ids = fields.Many2many("account.invoice", string='Invoices', compute="_get_invoiced", readonly=True)
     invoice_status = fields.Selection([
@@ -375,7 +374,7 @@ class SaleOrder(models.Model):
 
     @api.model
     def _prepare_procurement_group(self):
-        return {'name': self.name}
+        return {'name': self.name, 'is_sale': True}
 
     @api.one
     def action_confirm(self):
@@ -397,27 +396,18 @@ class SaleOrderLine(models.Model):
         self.price_subtotal = taxes['total_excluded']
 
     @api.one
-    @api.depends('product_id', 'order_id.state')
+    @api.depends('product_id.invoice_policy', 'order_id.state')
     def _get_delivered_updateable(self):
-        self.qty_delivered_updateable = True
-
-    @api.one
-    @api.depends('qty_delivered_manual')
-    def _get_delivered_qty(self):
-        if self.qty_delivered_updateable:
-            self.qty_delivered = self.qty_delivered_manual
+        if (self.product_id.invoice_policy=='delivery'):
+            self.qty_delivered_updateable = True
         else:
-            self.qty_delivered = 0
+            self.qty_delivered_updateable = False
 
     @api.one
-    def _set_delivered_qty(self):
-        self.qty_delivered_manual = self.qty_delivered
-
-    @api.one
-    @api.depends('order_id.invoice_policy', 'qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state')
+    @api.depends('qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state')
     def _get_to_invoice_qty(self):
-        if self.order_id.state=='sale':
-            if self.order_id.invoice_policy == 'order':
+        if self.order_id.state in ('sale', 'done'):
+            if self.product_id.invoice_policy == 'order':
                 self.qty_to_invoice = self.product_uom_qty - self.qty_invoiced
             else:
                 self.qty_to_invoice = self.qty_delivered - self.qty_invoiced
@@ -522,12 +512,8 @@ class SaleOrderLine(models.Model):
         required=True, default=1.0)
     product_uom = fields.Many2one('product.uom', string='Unit of Measure', required=True)
 
-    qty_delivered_manual = fields.Float(string='Delivered Manual', digits_compute= dp.get_precision('Product UoM'),
-            help="Delivered quantity for fields where it's set manually", default=0.0)
     qty_delivered_updateable = fields.Boolean(compute='_get_delivered_updateable', string='Can Edit Delivered', readonly=True, default=True)
-    qty_delivered = fields.Float(compute='_get_delivered_qty', string='Delivered',
-            inverse='_set_delivered_qty', readonly=False,
-            digits_compute=dp.get_precision('Product UoM'), default=0.0, store=True)
+    qty_delivered = fields.Float(string='Delivered', digits_compute=dp.get_precision('Product UoM'), default=0.0)
     qty_to_invoice = fields.Float(
         compute='_get_to_invoice_qty', string='To Invoice', store=True, readonly=True,
         digits_compute=dp.get_precision('Product UoM'), default=0.0)
@@ -743,3 +729,16 @@ class product_template(models.Model):
         return result
 
     sales_count = fields.Integer(compute='_sales_count', string='# Sales')
+    invoice_policy = fields.Selection([
+            ('order', 'Ordered quantities'),
+            ('delivery', 'Delivered quantities'),
+            ('time material', 'Time and material based'),
+            ('expense', 'At cost (e.g. expenses)'),
+        ], string='Invoicing Policy', default='no')
+
+
+class ProcurementGroup(models.Model):
+    _inherit = 'procurement.group'
+    sale_order_id = fields.Many2one('Sale Order', string='Sale Order')
+
+

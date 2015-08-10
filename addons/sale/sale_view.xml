@@ -461,6 +461,7 @@
                         <field string="Sales" name="sales_count" widget="statinfo" />
                     </button>
                 </div>
+
             </field>
         </record>
 
@@ -475,6 +476,9 @@
                         type="object" icon="fa-usd">
                         <field string="Sales" name="sales_count" widget="statinfo" />
                     </button>
+                    <field name="active" position="after">
+                        <field name="invoice_policy" widget="radio"/>
+                    </field>
                 </div>
             </field>
         </record>
