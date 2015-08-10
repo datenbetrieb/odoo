@@ -466,12 +466,10 @@ class SaleOrderLine(models.Model):
 
     @api.one
     def _action_procurement_create(self):
-        print self.state
         if self.state <> 'sale': return
         qty = 0.0
         for proc in self.procurement_ids:
             qty += proc.product_qty
-        print qty, self.product_uom_qty
         if qty >= self.product_uom_qty:
             return False
 
@@ -481,7 +479,6 @@ class SaleOrderLine(models.Model):
 
         vals = self._prepare_order_line_procurement(group_id=self.order_id.procurement_group_id.id)
         vals['product_qty'] = self.product_uom_qty - qty
-        print 'Procurement Created', vals
         result = self.env["procurement.order"].create(vals)
         self.env["procurement.order"].run([result])
         return True
@@ -500,7 +497,6 @@ class SaleOrderLine(models.Model):
         lines = False
         if 'product_uom_qty' in values:
             lines = self.filtered(lambda r: r.state=='sale' and r.product_uom_qty < values['product_uom_qty'])
-            print 'Lines', lines
         result = super(SaleOrderLine, self).write(values)
         if lines:
             lines._action_procurement_create()
@@ -635,13 +631,15 @@ class SaleOrderLine(models.Model):
             self.price_unit = 0.0
             return {}
         if self.order_id.pricelist_id and self.order_id.partner_id:
+            print self.product_id.name, self.product_uom.name, self.order_id.pricelist_id.name, self.order_id.partner_id.name
             product = self.product_id.with_context(
                 lang = self.order_id.partner_id.lang,
                 partner_id = self.order_id.partner_id.id,
                 date_order = self.order_id.date_order,
-                priclist_id = self.order_id.pricelist_id.id,
+                pricelist_id = self.order_id.pricelist_id.id,
                 uom = self.product_uom.id
             )
+            print '***', product.price
             self.price_unit = product.price
         return {}
 

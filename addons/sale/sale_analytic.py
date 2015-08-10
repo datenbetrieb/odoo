@@ -23,6 +23,7 @@ class AccountAnalyticLine(models.Model):
             if (line.amount > 0) or (not line.so_line):
                 continue
             qty = self.env['product.uom']._compute_qty_obj(line.product_uom_id, line.unit_amount, line.so_line.product_uom)
+            print line.unit_amount, ' ', line.product_uom_id.name, ' to ',qty,' ', line.so_line.product_uom.name
             line.so_line.qty_delivered = line.so_line.qty_delivered + line.unit_amount - oldvalues.get(line.id, )
         return result
 

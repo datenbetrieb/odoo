@@ -52,7 +52,7 @@ class AccountAnalyticLine(models.Model):
                 if sol:
                     line.write({
                         'product_id': sol.product_id.id,
-                        'product_uom_id': self.env.user.company_id.timesheet_uom_id.id or sol.product_uom.id,
+                        'product_uom_id': self.env.user.company_id.timesheet_uom_id.id or sol.product_id.uom_id.id,
                         'amount': -line.unit_amount * sol.product_id.standard_price,
                         'so_line': sol.id
                     })

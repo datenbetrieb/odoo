@@ -33,10 +33,10 @@ class SaleAdvancePaymentInv(models.TransientModel):
         return product.id
 
     advance_payment_method = fields.Selection([
-            ('delivered', 'Delivered Products'), 
+            ('delivered', 'Ready to invoice'), 
             ('all', 'Whole order'), 
-            ('percentage','Percentage'), 
-            ('fixed','Fixed price (deposit)')
+            ('percentage','Deposit (percentage)'), 
+            ('fixed','Deposit (fixed amount)')
         ], string='What do you want to invoice?', default=_get_advance_payment_method, required=True)
     product_id = fields.Many2one('product.product', string='Deposit Product',
         domain=[('type', '=', 'service')], default=_get_advance_product)
@@ -55,6 +55,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
 
     @api.multi
     def _create_invoice(self, order, so_line, amount):
+        print '_create_invoice'
         inv_obj = self.env['account.invoice']
         ir_property_obj = self.env['ir.property']
 
@@ -65,13 +66,14 @@ class SaleAdvancePaymentInv(models.TransientModel):
             prop = ir_property_obj.get('property_account_income_categ_id', 'product.category')
             prop_id = prop and prop.id or False
             account_id = order.fiscal_position_id.map_account(prop_id)
-            if not account_id:
-                raise UserError(_('There is no income account defined as global property.'))
+        print 'Account test'
         if not account_id:
+            print 'not account_id'
             raise UserError(
-                    _('There is no income account defined for this product: "%s"') % \
+                    _('There is no income account defined for this product: "%s". You may have to install a chart of account from Accounting app, settings menu.') % \
                         (self.product_id.name,))
 
+        print 'ICI'
         if self.amount <= 0.00:
             raise UserError(_('The value of Advance Amount must be positive.'))
         if self.advance_payment_method == 'percentage':
@@ -80,6 +82,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
         else:
             amount = self.amount
             name = _('Advance')
+        print 'LA'
 
         invoice = inv_obj.create({
             'name': order.client_order_ref or order.name,
@@ -107,6 +110,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
             'team_id': order.team_id.id,
         })
         invoice.compute_taxes()
+        print 'Invoice Created'
         return invoice
 
     @api.one

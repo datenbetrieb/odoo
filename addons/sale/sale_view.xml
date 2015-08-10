@@ -180,13 +180,15 @@
                                         <group>
                                             <field name="product_id"
                                                 context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom}"
+                                                attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"
                                                />
                                             <label for="product_uom_qty"/>
                                             <div>
                                                 <field
                                                     context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'uom_qty_change':True}"
                                                     name="product_uom_qty" class="oe_inline"/>
-                                                <field name="product_uom" groups="product.group_uom" class="oe_inline oe_no_button"/>
+                                                <field name="product_uom" groups="product.group_uom" class="oe_inline oe_no_button"
+                                                    attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
                                             </div>
                                             <field name="price_unit"/>
                                             <label for="discount" groups="sale.group_discount_per_so_line"/>
@@ -208,20 +210,24 @@
                                         <label for="invoice_lines"/>
                                         <field name="invoice_lines"/>
                                     </div>
+                                    <field name="state" invisible="1"/>
                                 </form>
                                 <tree string="Sales Order Lines" editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="product_id"
+                                        attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"
                                         context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom}"
                                        />
                                     <field name="name"/>
                                     <field name="product_uom_qty"
+                                        string="Ordered Qty"
                                         context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom}"/>
                                     <field name="qty_delivered" invisible="not context.get('show_sale', False)"
                                         attrs="{'readonly': [('qty_delivered_updateable', '=', False)]}"/>
                                     <field name="qty_invoiced"
                                         invisible="not context.get('show_sale', False)"/>
                                     <field name="product_uom"
+                                        attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"
                                         groups="product.group_uom" options='{"no_open": True}'/>
                                     <field name="price_unit"
                                         attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
@@ -229,6 +235,7 @@
                                     <field name="discount" groups="sale.group_discount_per_so_line"/>
                                     <field name="price_subtotal" widget="monetary"/>
                                     <field name="qty_delivered_updateable" invisible="1"/>
+                                    <field name="state" invisible="1"/>
                                 </tree>
                                 <kanban class="o_kanban_mobile">
                                     <field name="product_id"
