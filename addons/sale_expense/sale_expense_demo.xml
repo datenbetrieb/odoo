@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+    
+        <record id="car_travel" model="product.product">
+            <field name="invoice_policy">expense</field>
+        </record>
+
+        <record id="air_ticket" model="product.product">
+            <field name="invoice_policy">expense</field>
+        </record>
+
+        <record id="hotel_rent" model="product.product">
+            <field name="invoice_policy">expense</field>
+        </record>
+
+    </data>
+</openerp>
