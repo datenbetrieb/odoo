@@ -3,7 +3,7 @@
 
 
 {
-    'name': 'Reinvoice Expenses',
+    'name': 'Reinvoice Timesheets',
     'version': '1.1',
     'category': 'Sales Management',
     'description': """
@@ -12,8 +12,7 @@ Allow selling expenses
 """,
     'author': 'OpenERP S.A.',
     'website': 'https://www.odoo.com/',
-    'depends': ['hr_expense','sale'],
-    'data': ['sale_expense_view.xml'],
+    'depends': ['hr_timesheet','sale_contract'],
     'demo': [],
     'installable': True,
     'auto_install': True,

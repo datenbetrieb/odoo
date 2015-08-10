@@ -56,6 +56,7 @@ class account_analytic_account(models.Model):
         ], string='Type of Account', required=True, default='normal')
 
     tag_ids = fields.Many2many('account.analytic.tag', 'account_analytic_account_tag_rel', 'account_id', 'tag_id', string='Tags', copy=True)
+    line_ids = fields.One2many('account.analytic.line', 'account_id', string="Analytic Lines")
 
     company_id = fields.Many2one('res.company', string='Company', required=True, default=_default_company)
     partner_id = fields.Many2one('res.partner', string='Customer')

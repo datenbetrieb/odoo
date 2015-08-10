@@ -9,7 +9,8 @@ from openerp.addons.decimal_precision import decimal_precision as dp
 class SaleOrder(models.Model):
     _inherit = "sale.order"
     expense_policy = fields.Selection([
-            ('all', 'Charge travel and expenses'),
+            ('at cost', 'Charge expenses at cost'),
+            ('price', 'Charge expenses based on price'),
             ('no', 'Do not charge expenses'),
         ], string='Expenses', default='no')
 
@@ -23,20 +24,30 @@ class HrExpense(models.Model):
         for expense in self:
             orders = self.env['sale.order']
             for line in expense.line_ids:
-                order = sol_obj.search([('project_id', '=', line.analytic_account.id), ('state','=','sale'), ('expense_policy','=','all')])
+                order = sol_obj.search([('project_id', '=', line.analytic_account.id), ('state','=','sale'), ('expense_policy','<>','no')])
                 if not len(order):
                     continue
                 last_so_line = sol_obj.search([('order_id','=',order[0].id)], _order='sequence desc', limit=1)
                 last_sequence = 100
                 if last_so_line:
                     last_sequence = last_so_line.sequence + 1
-                fpos = self.order_id.fiscal_position_id or self.order_id.partner_id.property_account_position_id
+                fpos = order[0].fiscal_position_id or order[0].partner_id.property_account_position_id
                 taxes = fpos.map_tax(line.product_id.taxes_id)
+                price = line.unit_amount
+                if order[0].expense_policy == 'price':
+                    product = line.product_id.with_context(
+                        partner_id = order[0].partner_id.id,
+                        date_order = order[0].date_order,
+                        pricelist_id = order[0].pricelist_id.id,
+                        uom = line.product_uom.id
+                    )
+                    price = product.price
+
                 sol_obj.create({
                     'order_id': order[0].id,
                     'name': line.name
                     'sequence': last_sequence,
-                    'price_unit': line.unit_amount,
+                    'price_unit': price,
                     'tax_id': [x.id for x in taxes],
                     'discount': 0.0,
                     'product_id': line.product_id.id,
