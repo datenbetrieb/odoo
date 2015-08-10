@@ -99,6 +99,7 @@ class SaleOrderLine(models.Model):
     product_packaging = fields.Many2one('product.packaging', string='Packaging', default=False)
     route_id = fields.Many2one('stock.location.route', string='Route', domain=[('sale_selectable', '=', True)])
     product_tmpl_id = fields.Many2one('product.template', related='product_id.product_tmpl_id', string='Product Template')
+    procurement_ids = fields.One2many('procurement.order', 'so_line_id', string='Procurements')
 
     @api.multi
     def _prepare_order_line_procurement(self, group_id=False):
@@ -109,7 +110,8 @@ class SaleOrderLine(models.Model):
             'location_id': self.order_id.partner_shipping_id.property_stock_customer.id,
             'route_ids': self.route_id and [(4, self.route_id.id)] or [],
             'warehouse_id': self.order_id.warehouse_id and self.order_id.warehouse_id.id or False,
-            'partner_dest_id': self.order_id.partner_shipping_id.id
+            'partner_dest_id': self.order_id.partner_shipping_id.id,
+            'so_line_id': self.id,
         })
         return vals
 
@@ -119,6 +121,17 @@ class SaleOrderLine(models.Model):
         if self.product_id.type not in ('consu','product'):
             return super(SaleOrderLine, self)._get_delivered_updateable()
         self.qty_delivered_updateable = False
+
+    @api.multi
+    def _update_delivery(self):
+        for line in self:
+            qty = 0
+            for proc in line.procurement_ids:
+                for move in proc.move_ids:
+                    if move.state=='done':
+                        move_qty = move.product_uom._compute_qty_obj(move.product_uom_qty, line.product_uom)
+                        qty += move_qty
+            line.qty_delivered = qty
 
     @api.onchange('product_packaging')
     def product_packaging_change(self):
@@ -201,10 +214,31 @@ class sale_advance_payment_inv(models.TransientModel):
 class procurement_order(models.Model):
     _inherit = "procurement.order"
 
+    so_line_id = fields.Many2one('sale.order.line', string='Sale Order Line')
+
     @api.model
     def _run_move_create(self, procurement):
-        print '***', procurement
         vals = super(procurement_order, self)._run_move_create(procurement)
         if self.sale_line_id:
             vals.update({'sequence': self.sale_line_id.sequence})
         return vals
+
+
+#
+# Update delivered quantities on sale order lines
+#
+class stock_picking(models.Model):
+    _inherit = "stock.picking"
+
+    @api.multi
+    def action_done(self):
+        result = super(StockPicking, self).action_done()
+        todo = self.env['sale.order.line']
+        for picking in self:
+            for move in picking:
+                if (move.procurement_id.so_line_id) and (move.product_id.invoice_policy in ('ordered','delivered')):
+                    todo |= move.procurement_id.so_line_id
+        todo._update_delivery()
+        return result
+
+

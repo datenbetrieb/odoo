@@ -734,11 +734,7 @@ class product_template(models.Model):
             ('delivery', 'Delivered quantities'),
             ('time material', 'Time and material based'),
             ('expense', 'At cost (e.g. expenses)'),
-        ], string='Invoicing Policy', default='no')
+        ], string='Invoicing Policy', default='order')
 
-
-class ProcurementGroup(models.Model):
-    _inherit = 'procurement.group'
-    sale_order_id = fields.Many2one('Sale Order', string='Sale Order')
 
 

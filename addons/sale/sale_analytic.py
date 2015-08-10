@@ -70,7 +70,7 @@ class AccountAnalyticLine(models.Model):
 
         sol = sol_obj.create({
             'order_id': order[0].id,
-            'name': line.name
+            'name': line.name,
             'sequence': last_sequence,
             'price_unit': price,
             'tax_id': [x.id for x in taxes],

@@ -36,23 +36,6 @@
                 </field>
             </field>
         </record>
-        
-        <record id="action_picking_tree_invoice" model="ir.actions.act_window">
-            <field name="name">To Be Invoiced</field>
-            <field name="res_model">stock.picking</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form,calendar</field>
-            <field name="domain"></field>
-            <field name="context">{
-                    'search_default_picking_type_id': [active_id],
-                    'default_picking_type_id': active_id,
-                    'contact_display': 'partner_address',
-                    'search_default_to_be_invoiced': 1,
-            }
-            </field>
-            <field name="search_view_id" ref="view_picking_search_inherit"/>
-        </record>
 
     </data>
 </openerp>
