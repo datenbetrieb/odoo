@@ -100,7 +100,7 @@ class account_analytic_account(models.Model):
 class account_analytic_line(models.Model):
     _name = 'account.analytic.line'
     _description = 'Analytic Line'
-    _order = 'date desc'
+    _order = 'date desc, id desc'
 
     @api.model
     def _default_user(self):

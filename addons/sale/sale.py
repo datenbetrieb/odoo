@@ -607,9 +607,10 @@ class SaleOrderLine(models.Model):
 
         product = self.product_id.with_context(
             lang = self.order_id.partner_id.lang,
-            partner_id = self.order_id.partner_id.id,
-            date_order = self.order_id.date_order,
-            pricelist_id = self.order_id.pricelist_id.id,
+            partner = self.order_id.partner_id.id,
+            quantity = self.product_uom_qty,
+            date = self.order_id.date_order,
+            pricelist = self.order_id.pricelist_id.id,
             uom = self.product_uom.id
         )
 
@@ -631,15 +632,14 @@ class SaleOrderLine(models.Model):
             self.price_unit = 0.0
             return {}
         if self.order_id.pricelist_id and self.order_id.partner_id:
-            print self.product_id.name, self.product_uom.name, self.order_id.pricelist_id.name, self.order_id.partner_id.name
             product = self.product_id.with_context(
                 lang = self.order_id.partner_id.lang,
-                partner_id = self.order_id.partner_id.id,
+                partner = self.order_id.partner_id.id,
+                quantity = self.product_uom_qty,
                 date_order = self.order_id.date_order,
-                pricelist_id = self.order_id.pricelist_id.id,
+                pricelist = self.order_id.pricelist_id.id,
                 uom = self.product_uom.id
             )
-            print '***', product.price
             self.price_unit = product.price
         return {}
 

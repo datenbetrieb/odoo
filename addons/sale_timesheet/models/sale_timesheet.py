@@ -20,18 +20,13 @@ class product_template(models.Model):
 
 class AccountAnalyticLine(models.Model):
     _inherit = 'account.analytic.line'
-
-    @api.model
-    def create(self, values):
-        result = super(AccountAnalyticLine, self).create(values)
-        result._update_timesheet_line()
-        return result
-
     @api.multi
     def write(self, values):
         result = super(AccountAnalyticLine, self).write(values)
-        if 'unit_amount' in values:
-            self._update_timesheet_line()
+        if ('unit_amount' in values) and ('amount' not in values):
+            for line in self:
+                if line.is_timesheet and line.product_id:
+                    line.amount = -line.unit_amount * line.product_id.standard_price
         return result
 
     @api.multi
@@ -56,7 +51,8 @@ class AccountAnalyticLine(models.Model):
                         'amount': -line.unit_amount * sol.product_id.standard_price,
                         'so_line': sol.id
                     })
-        return True
+        result = super(AccountAnalyticLine, self)._update_timesheet_line()
+        return result
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
