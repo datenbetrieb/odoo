@@ -50,23 +50,6 @@
             </field>
         </record>
 
-        <!-- Menus -->
-        <record id="action_project_timesheet_bill_task" model="ir.actions.act_window">
-            <field name="name">Invoice Tasks</field>
-            <field name="res_model">account.analytic.line</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form,pivot</field>
-            <field name="domain">[]</field>
-            <field name="context">{'search_default_to_invoice': 1}</field>
-            <field name="view_id" ref="view_account_analytic_line_tree_inherit_account_id"/>
-            <field name="help" type="html">
-              <p>
-                You will find here timesheets and purchases you did for contracts that can be reinvoiced to the customer.
-                If you want to record new jobs to invoice, you should use the timesheet menu instead.
-              </p>
-            </field>
-        </record>
-
         <!--
             Time Tracking menu in project Management
         -->
@@ -109,14 +92,8 @@
                             <field name="date"/>
                             <field name="user_id" required="1"/>
                             <field name="name"/>
-                            <field name="account_id" on_change="on_change_account_id(account_id, user_id, unit_amount, is_timesheet, context)"/>
-                            <field name="unit_amount" string="Duration" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id,journal_id, context)" sum="Total time" widget="float_time"/>
-                            <field name="to_invoice"/>
-                            <field name="product_uom_id" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id,journal_id, context)" invisible="1"/>
-                            <field name="journal_id" invisible="1"/>
-                            <field name="amount" sum="Total cost" invisible="1"/>
-                            <field name="general_account_id" invisible="1"/>
-                            <field name="product_id" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id,journal_id, context)" domain="[('type','=','service')]" invisible="1"/>
+                            <field name="account_id"/>
+                            <field name="unit_amount" string="Duration" sum="Total time" widget="float_time"/>
                             <field name="is_timesheet" invisible="1"/>
                         </tree>
                     </field>

@@ -25,12 +25,6 @@ class project_project(osv.osv):
             'default_is_timesheet':True
         }
         help = _("""<p class="oe_view_nocontent_create">Record your timesheets for the project '%s'.</p>""") % (project.name,)
-        try:
-            if project.to_invoice and project.partner_id:
-                help+= _("""<p>Timesheets on this project may be invoiced to %s, according to the terms defined in the contract.</p>""" ) % (project.partner_id.name,)
-        except:
-            # if the user do not have access rights on the partner
-            pass
 
         res = mod_obj.get_object_reference(cr, uid, 'hr_timesheet', 'act_hr_timesheet_line_evry1_all_form')
         id = res and res[1] or False

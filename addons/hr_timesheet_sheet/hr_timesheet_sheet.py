@@ -587,7 +587,7 @@ class hr_timesheet_sheet_sheet_account(osv.osv):
         }
 
     _depends = {
-        'account.analytic.line': ['account_id', 'date', 'to_invoice', 'unit_amount', 'user_id'],
+        'account.analytic.line': ['account_id', 'date', 'unit_amount', 'user_id'],
         'hr_timesheet_sheet.sheet': ['date_from', 'date_to', 'user_id'],
     }
 
@@ -597,15 +597,14 @@ class hr_timesheet_sheet_sheet_account(osv.osv):
                 min(l.id) as id,
                 l.account_id as name,
                 s.id as sheet_id,
-                sum(l.unit_amount) as total,
-                l.to_invoice as invoice_rate
+                sum(l.unit_amount) as total
             from
                 account_analytic_line l
                     LEFT JOIN hr_timesheet_sheet_sheet s
                         ON (s.date_to >= l.date
                             AND s.date_from <= l.date
                             AND s.user_id = l.user_id)
-            group by l.account_id, s.id, l.to_invoice
+            group by l.account_id, s.id
         )""")
 
 

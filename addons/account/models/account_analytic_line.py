@@ -20,59 +20,6 @@ class AccountAnalyticLine(models.Model):
     amount_currency = fields.Monetary(related='move_id.amount_currency', store=True, help="The amount expressed in the related account currency if not equal to the company one.", readonly=True)
     partner_id = fields.Many2one('res.partner', related='account_id.partner_id', string='Partner', store=True)
 
-    # Compute the cost based on the price type define into company
-    # property_valuation_price_type property
-    @api.v7
-    def on_change_unit_amount(self, cr, uid, id, prod_id, quantity, company_id,
-            unit=False, context=None):
-        if context is None:
-            context = {}
-        product_obj = self.pool.get('product.product')
-        product_price_type_obj = self.pool.get('product.price.type')
-        product_uom_obj = self.pool.get('product.uom')
-        prod = product_obj.browse(cr, uid, prod_id, context=context)
-        result = 0.0
-        if prod_id:
-            unit_obj = False
-            if unit:
-                unit_obj = product_uom_obj.browse(cr, uid, unit, context=context)
-            if not unit_obj or prod.uom_id.category_id.id != unit_obj.category_id.id:
-                unit = prod.uom_id.id
-        a = prod.property_account_income_id.id
-        if not a:
-            a = prod.categ_id.property_account_income_categ_id.id
-
-        flag = False
-        # Compute based on pricetype
-        product_price_type_ids = product_price_type_obj.search(cr, uid, [('field', '=', 'standard_price')], context=context)
-        pricetype = product_price_type_obj.browse(cr, uid, product_price_type_ids, context=context)[0]
-        # Take the company currency as the reference one
-        if pricetype.field == 'list_price':
-            flag = True
-        ctx = context.copy()
-        if unit:
-            # price_get() will respect a 'uom' in its context, in order
-            # to return a default price for those units
-            ctx['uom'] = unit
-        amount_unit = prod.price_get(pricetype.field, context=ctx)
-        if amount_unit:
-            amount_unit = amount_unit[prod.id]
-        else:
-            amount_unit = 0.0
-
-        amount = amount_unit * quantity or 0.0
-        cur_record = self.browse(cr, uid, id, context=context)
-        currency = cur_record.exists() and cur_record.currency_id or prod.company_id.currency_id
-        result = round(amount, currency.decimal_places)
-        if not flag:
-            result *= -1
-        return {'value': {
-            'amount': result,
-            'general_account_id': a,
-            'product_uom_id': unit
-            }
-        }
-
     @api.v8
     @api.onchange('product_id', 'product_uom_id')
     def on_change_unit_amount(self):

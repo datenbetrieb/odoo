@@ -12,7 +12,7 @@
                         context="{'default_groups_ref': ['base.group_user']}"/>
                     <field name="name"/>
                     <field name="account_id" context="{'default_use_timesheets': 1, 'default_type': 'contract'}" options="{'no_open': True, 'no_create': True}"/>
-                    <field name="unit_amount" string="Duration" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id)" sum="Total time" widget="float_time"/>
+                    <field name="unit_amount" string="Duration" sum="Total time" widget="float_time"/>
                     <field name="is_timesheet" invisible="1"/>
                 </tree>
             </field>
@@ -38,10 +38,10 @@
                         <page string="Information">
                         <group>
                             <group string="Product">
-                                <field name="product_id" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id)" domain="[('type','=','service')]"/>
+                                <field name="product_id" domain="[('type','=','service')]"/>
                                 <label string="Duration" for="unit_amount"/>
                                 <div>
-                                    <field name="unit_amount" class="oe_inline" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id)"/>
+                                    <field name="unit_amount" class="oe_inline"/>
                                     <field name="product_uom_id" class="oe_inline"/>
                                 </div>
                             </group>
