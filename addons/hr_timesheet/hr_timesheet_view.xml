@@ -153,5 +153,17 @@
 
         <menuitem id="menu_hr_working_hours" parent="hr_attendance.menu_hr_time_tracking" action="act_hr_timesheet_line_evry1_all_form"/>
 
+        <record id="view_product_timesheet_form" model="ir.ui.view">
+            <field name="name">product.template.timesheet.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <field name="type" position="after">
+                    <field name="is_timesheet"/>
+                </field>
+            </field>
+        </record>
+
+
     </data>
 </openerp>
