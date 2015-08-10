@@ -42,11 +42,11 @@ class product_template(osv.osv):
         'valuation': 'manual_periodic',
     }
 
-    def onchange_type(self, cr, uid, ids, type):
-        res = super(product_template, self).onchange_type(cr, uid, ids, type)
-        if type in ('consu', 'service'):
-            res = {'value': {'valuation': 'manual_periodic'}}
-        return res
+    @api.onchange('type')
+    def onchange_type_valuation(self):
+        if self.type in ('consu', 'service'):
+            self.valuation = 'manual_periodic'
+        return {}
 
     @api.multi
     def _get_product_accounts(self):
@@ -129,11 +129,13 @@ class product_template(osv.osv):
 
 class product_product(osv.osv):
     _inherit = 'product.product'
-    def onchange_type(self, cr, uid, ids, type):
-        res = super(product_product, self).onchange_type(cr, uid, ids, type)
-        if type in ('consu', 'service'):
-            res = {'value': {'valuation': 'manual_periodic'}}
-        return res
+
+    @api.onchange('type')
+    def onchange_type_valuation(self):
+        if self.type in ('consu', 'service'):
+            self.valuation = 'manual_periodic'
+        return {}
+
 class product_category(osv.osv):
     _inherit = 'product.category'
     _columns = {

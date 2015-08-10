@@ -74,13 +74,15 @@ class account_analytic_account(models.Model):
             name = analytic.name
             if analytic.code:
                 name = '['+analytic.code+'] '+name
+            if analytic.partner_id:
+                name = name +' - '+analytic.partner_id.commercial_partner_id.name
             res.append((analytic.id, name))
         return res
 
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
         args = args or []
-        recs = self.search(['|', ('code', operator, name), ('name', operator, name)] + args, limit=limit)
+        recs = self.search(['|', '|', ('code', operator, name), ('partner_id', operator, name), ('name', operator, name)] + args, limit=limit)
         return recs.name_get()
 
     @api.multi

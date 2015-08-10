@@ -14,7 +14,7 @@ Adds menu to show relevant information to each manager.You can also view the rep
 """,
     'author': 'Camptocamp / Odoo',
     'website': 'https://www.odoo.com/page/billing',
-    'depends': ['hr_timesheet_invoice', 'sale', 'payment'], #although sale is technically not required to install this module, all menuitems are located under 'Sales' application
+    'depends': ['sale', 'payment'], #although sale is technically not required to install this module, all menuitems are located under 'Sales' application
     'data': [
         'security/account_analytic_analysis_security.xml',
         'security/ir.model.access.csv',

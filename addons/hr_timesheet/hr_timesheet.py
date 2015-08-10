@@ -8,18 +8,6 @@ class Company(models.Model):
     _inherit = 'res.company'
     timesheet_uom_id = fields.Many2one('product.uom', 'Timesheet UoM')
 
-class product_template(models.Model):
-    _inherit = 'product.template'
-    is_timesheet = fields.Boolean(string="Track Service Time")
-
-    @api.onchange('type', 'invoice_policy')
-    def onchange_type(self):
-        if self.type=='service' and self.invoice_policy=='time material':
-            self.is_timesheet = True
-        if self.type<>'service':
-            self.is_timesheet = False
-        return {}
-
 class account_analytic_line(models.Model):
     _inherit = 'account.analytic.line'
     is_timesheet = fields.Boolean(string="Is a Timesheet")

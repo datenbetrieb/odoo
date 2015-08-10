@@ -10,8 +10,9 @@
                 <page name="sales" position="after">
                     <page string="Accounting" groups="account.group_account_invoice">
                         <group>
-                            <label for="categ_id" string="Internal Category"/>
-                            <div><field name="categ_id" colspan="3" nolabel="1"/></div>
+                            <group>
+                                <field name="categ_id"/>
+                            </group>
                         </group>
                         <group name="properties">
                             <group>

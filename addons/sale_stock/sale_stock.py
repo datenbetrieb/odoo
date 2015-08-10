@@ -56,7 +56,7 @@ class SaleOrder(models.Model):
     @api.onchange('warehouse_id')
     def onchange_warehouse_id(self):
         if self.warehouse_id.company_id:
-            self.company_id = self.warehouse.company_id.id
+            self.company_id = self.warehouse_id.company_id.id
 
     def action_view_delivery(self, cr, uid, ids, context=None):
         '''
@@ -104,9 +104,11 @@ class SaleOrderLine(models.Model):
     @api.multi
     def _prepare_order_line_procurement(self, group_id=False):
         vals = super(SaleOrderLine, self)._prepare_order_line_procurement(group_id=group_id)
-        date_planned = vals['date_planned']
+        date_planned = datetime.strptime(self.order_id.date_order, DEFAULT_SERVER_DATETIME_FORMAT) \
+            + timedelta(days=self.customer_lead or 0.0) \
+            - timedelta(days=self.order_id.company_id.security_lead)
         vals.update({
-            'date_planned': (date_planned - timedelta(days=self.order_id.company_id.security_lead)).strftime(DEFAULT_SERVER_DATETIME_FORMAT),
+            'date_planned': date_planned.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
             'location_id': self.order_id.partner_shipping_id.property_stock_customer.id,
             'route_ids': self.route_id and [(4, self.route_id.id)] or [],
             'warehouse_id': self.order_id.warehouse_id and self.order_id.warehouse_id.id or False,
@@ -121,6 +123,11 @@ class SaleOrderLine(models.Model):
         if self.product_id.type not in ('consu','product'):
             return super(SaleOrderLine, self)._get_delivered_updateable()
         self.qty_delivered_updateable = False
+
+    @api.onchange('product_id')
+    def product_lead_time_set(self):
+        self.customer_lead = self.product_id.sale_delay
+        return {}
 
     @api.multi
     def _update_delivery(self):

@@ -18,7 +18,7 @@
                         </div>
                         <label for="default_invoice_policy"/>
                         <div>
-                            <field name="default_invoice_policy" class="oe_inline"/>
+                            <field name="default_invoice_policy" class="oe_inline" widget="radio"/>
                         </div>
                     </group>
                     <group name='default_options' invisible="1">

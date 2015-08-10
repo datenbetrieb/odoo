@@ -31,7 +31,6 @@ up a management by affair.
         'hr_dashboard.xml',
     ],
     'demo': [
-        'hr_timesheet_demo.xml',
         'hr_timesheet_demo.yml',
     ],
     'test': [

@@ -14,22 +14,22 @@ class AccountAnalyticLine(models.Model):
 
     @api.multi
     def write(self, values):
-        if 'unit_amount' in values:
-            oldvalues = dict([(x.id, x.product_uom_qty) for x in self])
-        result = super(AccountAnalyticLine, write).write(values)
-        if 'unit_amount' not in values:
+        if ('unit_amount' in values) or ('so_line' in values):
+            oldvalues = dict([(x.id, x.unit_amount) for x in self])
+        result = super(AccountAnalyticLine, self).write(values)
+        if ('unit_amount' not in values) and ('so_line' not in values):
             return result
         for line in self:
-            if (line.amount >= 0) or (not line.so_line):
+            if (line.amount > 0) or (not line.so_line):
                 continue
-            qty = line.product_uom._compute_qty_obj(values['unit_amount'], line.so_line.product_uom)
-            line.product_uom_qty = line.product_uom_qty + values['unit_amount'] - oldvalues.get(line.id, 0.0)
+            qty = self.env['product.uom']._compute_qty_obj(line.product_uom_id, line.unit_amount, line.so_line.product_uom)
+            line.so_line.qty_delivered = line.so_line.qty_delivered + line.unit_amount - oldvalues.get(line.id, )
         return result
 
     @api.model
     def create(self, values):
         line = super(AccountAnalyticLine, self).create(values)
-        if (line.amount >= 0) or not line.product_id:
+        if (line.amount > 0) or not line.product_id:
             return line
         if line.product_id.invoice_policy not in ('time material','expense','ordered'):
             return line
@@ -40,8 +40,8 @@ class AccountAnalyticLine(models.Model):
         if line.product_id.invoice_policy in ('time material', 'ordered'):
             sol = sol_obj.search([('order_id.project_id','=',line.account_id.id),('state','=','sale'),('product_id','=',line.product_id.id)])
             if sol:
-                qty = line.product_uom._compute_qty_obj(line.unit_amount, sol[0].product_uom)
-                sol[0].product_uom.qty += qty
+                qty = self.env['product.uom']._compute_qty_obj(line.product_uom_id, line.unit_amount, sol[0].product_uom)
+                sol[0].qty_delivered += qty
                 line.so_line = sol[0].id
                 return line
 
@@ -64,7 +64,7 @@ class AccountAnalyticLine(models.Model):
                 partner_id = order[0].partner_id.id,
                 date_order = order[0].date_order,
                 pricelist_id = order[0].pricelist_id.id,
-                uom = line.product_uom.id
+                uom = line.product_uom_id.id
             )
             price = product.price
 
@@ -76,9 +76,9 @@ class AccountAnalyticLine(models.Model):
             'tax_id': [x.id for x in taxes],
             'discount': 0.0,
             'product_id': line.product_id.id,
-            'product_uom': line.product_uom.id,
+            'product_uom': line.product_uom_id.id,
             'product_uom_qty': 0.0,
-            'qty_delivered': line.unit_quantity,
+            'qty_delivered': line.unit_amount,
         })
         line.so_line = sol[0].id
         return line

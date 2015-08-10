@@ -380,6 +380,24 @@ class SaleOrder(models.Model):
     def action_confirm(self):
         self.state = 'sale'
         self.order_line._action_procurement_create()
+        if not self.project_id:
+            for line in self.order_line:
+                if line.product_id.invoice_policy in ('time material','expense'):
+                    self._create_analytic_account()
+                    break
+
+    @api.one
+    def _create_analytic_account(self, prefix=None):
+        name = self.name
+        if prefix:
+            name = prefix+": "+self.name
+        a_id = self.env['account.analytic.account'].create({
+            'name': self.name,
+            'code': self.client_order_ref,
+            'company_id': self.company_id.id,
+            'partner_id': self.partner_id.id
+        })
+        self.project_id = a_id.id
 
 class SaleOrderLine(models.Model):
     _name = 'sale.order.line'
@@ -434,11 +452,10 @@ class SaleOrderLine(models.Model):
     @api.multi
     def _prepare_order_line_procurement(self, group_id=False):
         self.ensure_one()
-        date_planned = datetime.strptime(self.order_id.date_order, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=self.customer_lead or 0.0)
         return {
             'name': self.name,
             'origin': self.order_id.name,
-            'date_planned': date_planned,
+            'date_planned': self.order_id.date_order,
             'product_id': self.product_id.id,
             'product_qty': self.product_uom_qty,
             'product_uom': self.product_uom.id,
@@ -608,7 +625,6 @@ class SaleOrderLine(models.Model):
             name += '\n'+product.description_sale
         self.name = name
 
-        self.customer_lead = self.product_id.sale_delay
         if self.order_id.pricelist_id and self.order_id.partner_id:
             self.price_unit = product.price
         return {'domain': domain}
@@ -634,6 +650,18 @@ class SaleOrderLine(models.Model):
         if line.filtered(lambda x: x.state in ('sale','done')):
             raise UserError(_('You can not remove a sale order line.\nDiscard changes and try setting the quantity to 0.'))
         return super(SaleOrderLine, self).unlink()
+
+    @api.multi
+    def _update_time_material(self):
+        for line in self:
+            qty = 0
+            for proc in line.procurement_ids:
+                for move in proc.move_ids:
+                    if move.state=='done':
+                        move_qty = move.product_uom._compute_qty_obj(move.product_uom_qty, line.product_uom)
+                        qty += move_qty
+            line.qty_delivered = qty
+
 
 
 class MailComposeMessage(models.Model):
