@@ -4,6 +4,9 @@
 from openerp import models, api, fields, exceptions
 from openerp.tools.translate import _
 
+class HrEmployee(models.Model):
+    _inherit = 'hr.employee'
+    timesheet_cost = fields.Float(string='Timesheet Cost', default=0.0)
 
 class product_template(models.Model):
     _inherit = 'product.template'
@@ -45,10 +48,15 @@ class AccountAnalyticLine(models.Model):
                 else:
                     sol = line.so_line
                 if sol:
+                    cost = 0.0
+                    employee_obj = self.env['hr.employee']
+                    emp = employee_obj.search([('user_id', '=', line.user_id.id)])
+                    if emp:
+                        cost = emp[0].timesheet_cost
                     line.write({
                         'product_id': sol.product_id.id,
                         'product_uom_id': self.env.user.company_id.timesheet_uom_id.id or sol.product_id.uom_id.id,
-                        'amount': -line.unit_amount * sol.product_id.standard_price,
+                        'amount': -line.unit_amount * timesheet_cost,
                         'so_line': sol.id
                     })
         result = super(AccountAnalyticLine, self)._update_timesheet_line()
