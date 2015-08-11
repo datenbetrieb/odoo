@@ -158,6 +158,7 @@ class project(osv.osv):
         'task_ids': fields.one2many('project.task', 'project_id',
                                     domain=[('stage_id.fold', '=', False)]),
         'color': fields.integer('Color Index'),
+        'user_id': fields.many2one('res.users', 'Project Manager'),
         'alias_id': fields.many2one('mail.alias', 'Alias', ondelete="restrict", required=True,
                                     help="Internal email associated with this project. Incoming emails are automatically synchronized "
                                          "with Tasks (or optionally Issues if the Issue Tracker module is installed)."),
@@ -199,6 +200,7 @@ class project(osv.osv):
         'label_tasks': 'Tasks',
         'state': 'open',
         'sequence': 10,
+        'user_id': lambda self,cr,uid,ctx: uid,
         'type_ids': _get_type_common,
         'alias_model': 'project.task',
         'privacy_visibility': 'employees',
