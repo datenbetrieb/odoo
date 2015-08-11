@@ -130,7 +130,7 @@
                                 </group>
                             </group>
                         </page>
-                        <page string="Accounting Info" groups="account.group_account_user" attrs="{'invisible': [('state', 'not in', ['done', 'paid'])]}">
+                        <page string="Accounting Info" groups="account.group_account_user" attrs="{'invisible': [('state', 'not in', ['done', 'paid', 'accepted'])]}">
                             <group>
                                 <group>
                                     <field name="journal_id" widget="selection" attrs="{'readonly':[('state','=','done')]}" domain="[('type', '=', 'purchase')]" string="Journal"/>

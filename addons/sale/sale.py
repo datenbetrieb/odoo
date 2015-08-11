@@ -646,7 +646,7 @@ class SaleOrderLine(models.Model):
 
     @api.multi
     def unlink(self):
-        if line.filtered(lambda x: x.state in ('sale','done')):
+        if self.filtered(lambda x: x.state in ('sale','done')):
             raise UserError(_('You can not remove a sale order line.\nDiscard changes and try setting the quantity to 0.'))
         return super(SaleOrderLine, self).unlink()
 

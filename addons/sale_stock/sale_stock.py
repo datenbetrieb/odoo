@@ -136,7 +136,7 @@ class SaleOrderLine(models.Model):
             for proc in line.procurement_ids:
                 for move in proc.move_ids:
                     if move.state=='done':
-                        move_qty = move.product_uom._compute_qty_obj(move.product_uom_qty, line.product_uom)
+                        move_qty = self.env['product.uom']._compute_qty_obj(move.product_uom, move.product_uom_qty, line.product_uom)
                         qty += move_qty
             line.qty_delivered = qty
 
@@ -234,19 +234,19 @@ class procurement_order(models.Model):
 #
 # Update delivered quantities on sale order lines
 #
-class stock_picking(models.Model):
-    _inherit = "stock.picking"
+class StockMove(models.Model):
+    _inherit = "stock.move"
 
     @api.multi
     def action_done(self):
-        result = super(StockPicking, self).action_done()
+        print 'Action Done Move', self
+        result = super(StockMove, self).action_done()
         todo = self.env['sale.order.line']
-        for picking in self:
-            for move in picking:
-                if (move.procurement_id.so_line_id) and (move.product_id.invoice_policy in ('ordered','delivered')):
-                    todo |= move.procurement_id.so_line_id
+        for move in self:
+            if (move.procurement_id.so_line_id) and (move.product_id.invoice_policy in ('order','delivery')):
+                todo |= move.procurement_id.so_line_id
+        print 'Update Delivery', todo
         todo._update_delivery()
-        raise
         return result
 
 

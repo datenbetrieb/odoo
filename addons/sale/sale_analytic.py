@@ -61,9 +61,10 @@ class AccountAnalyticLine(models.Model):
             if line.product_id.invoice_policy == 'order':
                 continue
 
-            order = sol_obj.search([('project_id','=',line.account_id.id),('state','=','sale')])
+            order = so_obj.search([('project_id','=',line.account_id.id),('state','=','sale')])
 
-            last_so_line = sol_obj.search([('order_id','=',order[0].id)], _order='sequence desc', limit=1)
+            print [('order_id','=',order[0].id)]
+            last_so_line = sol_obj.search([('order_id','=',order[0].id)], order='sequence desc', limit=1)
             last_sequence = 100
             if last_so_line:
                 last_sequence = last_so_line.sequence + 1
@@ -71,7 +72,7 @@ class AccountAnalyticLine(models.Model):
             fpos = order[0].fiscal_position_id or order[0].partner_id.property_account_position_id
             taxes = fpos.map_tax(line.product_id.taxes_id)
             price = -line.amount
-            if order[0].expense_policy == 'time material':
+            if line.product_id.invoice_policy == 'time material':
                 product = line.product_id.with_context(
                     partner = order[0].partner_id.id,
                     date_order = order[0].date_order,
