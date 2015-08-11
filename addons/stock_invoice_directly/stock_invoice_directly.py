@@ -18,7 +18,7 @@ class stock_picking(osv.osv):
         res = super(stock_picking, self).do_new_transfer(cr, uid, ids, context=context)
         if res: #If it is already returning a wizard
             return res
-        pick_ids = [p.id for p in self.browse(cr, uid, ids, context) if p.invoice_state == '2binvoiced']
+        pick_ids = [p.id for p in self.browse(cr, uid, ids, context)]
         if pick_ids:
             context = dict(context, active_model='stock.picking', active_ids=pick_ids)
             return {

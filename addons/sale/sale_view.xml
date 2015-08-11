@@ -333,14 +333,12 @@
                     <field name="team_id" string="Sales Team"/>
                     <field name="project_id"/>
                     <field name="product_id"/>
-                    <filter string="My" domain="[('user_id','=',uid)]" name="my_sale_orders_filter"/>
+                    <filter string="My Orders" domain="[('user_id','=',uid)]" name="my_sale_orders_filter"/>
                     <separator/>
                     <filter string="Quotations" name="draft" domain="[('state','in',('draft','sent'))]" help="Sales Order that haven't yet been confirmed"/>
                     <filter string="Sales" name="sales" domain="[('state','in',('progress','Done'))]"/>
                     <separator/>
-                    <filter string="Not Invoiced" domain="[('invoice_status','=','no')]"/>
                     <filter string="To Invoice" domain="[('invoice_status','=','to invoice')]"/>
-                    <filter string="Fully Invoices" domain="[('invoice_status','=','invoiced')]"/>
                     <filter string="Upselling" domain="[('invoice_status','=','upselling')]"/>
                     <separator/>
                     <filter string="New Mail" name="message_unread" domain="[('message_unread','=',True)]"/>
@@ -373,17 +371,36 @@
             </field>
         </record>
 
-        <menuitem action="action_orders" id="menu_sale_order" parent="base.menu_sales" sequence="12" groups="base.group_sale_salesman,base.group_sale_manager"/>
+        <menuitem action="action_orders"
+            id="menu_sale_order" parent="base.menu_sales"
+            sequence="12" groups="base.group_sale_salesman,base.group_sale_manager"/>
 
-        <record id="action_orders_in_progress" model="ir.actions.act_window">
-            <field name="name">Sales Order to Invoice</field>
+        <record id="action_orders_to_invoice" model="ir.actions.act_window">
+            <field name="name">Sales to Invoice</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">sale.order</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form,calendar,graph</field>
+            <field name="view_mode">tree,form,calendar,graph,pivot</field>
             <field name="domain">[('invoice_status','=','to invoice')]</field>
-            <field name="search_view_id" ref="view_sales_order_filter"/>
         </record>
+        <menuitem name="Invoicing"
+            id="menu_sale_invoicing" parent="base.menu_base_partner"
+            sequence="5"/>
+        <menuitem action="action_orders_to_invoice"
+            id="menu_sale_order_invoice" parent="sale.menu_sale_invoicing"
+            sequence="2"/>
+
+        <record id="action_orders_upselling" model="ir.actions.act_window">
+            <field name="name">Upselling Opportunities</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,calendar,graph,pivot</field>
+            <field name="domain">[('invoice_status','=','upselling')]</field>
+        </record>
+        <menuitem action="action_orders_upselling"
+            id="menu_sale_order_upselling" parent="sale.menu_sale_invoicing"
+            sequence="5"/>
 
 
         <record id="action_quotations" model="ir.actions.act_window">

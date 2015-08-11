@@ -246,6 +246,7 @@ class stock_picking(models.Model):
                 if (move.procurement_id.so_line_id) and (move.product_id.invoice_policy in ('ordered','delivered')):
                     todo |= move.procurement_id.so_line_id
         todo._update_delivery()
+        raise
         return result
 
 

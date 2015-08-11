@@ -33,7 +33,6 @@ Dashboard / Reports for Warehouse Management includes:
         'stock_account_data.xml',
         'wizard/stock_change_standard_price_view.xml',
         'wizard/stock_valuation_history_view.xml',
-        'wizard/stock_return_picking_view.xml',
         'product_data.xml',
         'product_view.xml',
         'stock_account_view.xml',

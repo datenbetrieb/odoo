@@ -40,7 +40,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
         ], string='What do you want to invoice?', default=_get_advance_payment_method, required=True)
     product_id = fields.Many2one('product.product', string='Deposit Product',
         domain=[('type', '=', 'service')], default=_get_advance_product)
-    count = fields.Integer(compute=_count, string='# of Orders')
+    count = fields.Integer(default=_count, string='# of Orders')
     amount = fields.Float('Deposit Amount', digits=(16,2),
         help="The amount to be invoiced in advance, taxes excluded.")
 

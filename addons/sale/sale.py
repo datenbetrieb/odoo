@@ -45,14 +45,15 @@ class SaleOrder(models.Model):
         for line in self.order_line:
             if line.qty_to_invoice:
                 status = 'to invoice'
-            elif (line.qty_invoiced < line.product_uom_qty) and (status <> 'to invoice'):
-                status = 'no'
+            elif status <> 'to invoice':
+                if (line.qty_delivered > line.product_uom_qty) and (self.state=='sale'):
+                    status = 'upselling'
+                elif (line.qty_invoiced < line.product_uom_qty) and (status <> 'upselling'):
+                    status = 'no'
             for il in line.invoice_lines:
                 invoices.add(il.invoice_id)
         if self.state not in ('sale', 'done'):
             status='no'
-        if self.state == 'done':
-            status='invoiced'
         self.invoice_count = len(invoices)
         self.invoice_ids = map(lambda x: x.id, invoices)
         self.invoice_status = status

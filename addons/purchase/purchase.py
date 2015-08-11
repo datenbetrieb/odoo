@@ -770,7 +770,6 @@ class purchase_order(osv.osv):
             'origin': order.name,
             'route_ids': order.picking_type_id.warehouse_id and [(6, 0, [x.id for x in order.picking_type_id.warehouse_id.route_ids])] or [],
             'warehouse_id':order.picking_type_id.warehouse_id.id,
-            'invoice_state': order.invoice_method == 'picking' and '2binvoiced' or 'none',
         }
 
         diff_quantity = order_line.product_qty
@@ -781,7 +780,6 @@ class purchase_order(osv.osv):
                 'product_uom_qty': min(procurement_qty, diff_quantity),
                 'move_dest_id': procurement.move_dest_id.id,  #move destination is same as procurement destination
                 'procurement_id': procurement.id,
-                'invoice_state': procurement.rule_id.invoice_state or (procurement.location_id and procurement.location_id.usage == 'customer' and procurement.invoice_state=='2binvoiced' and '2binvoiced') or (order.invoice_method == 'picking' and '2binvoiced') or 'none', #dropship case takes from sale
                 'propagate': procurement.rule_id.propagate,
             })
             diff_quantity -= min(procurement_qty, diff_quantity)
