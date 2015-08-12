@@ -6,7 +6,6 @@ from openerp.tools.translate import _
 
 class Company(models.Model):
     _inherit = 'res.company'
-    timesheet_uom_id = fields.Many2one('product.uom', 'Timesheet UoM')
 
 class account_analytic_line(models.Model):
     _inherit = 'account.analytic.line'

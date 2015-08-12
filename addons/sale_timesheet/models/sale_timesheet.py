@@ -4,6 +4,16 @@
 from openerp import models, api, fields, exceptions
 from openerp.tools.translate import _
 
+class ResCompany(models.Model):
+    _inherit = 'res.company'
+    @api.model
+    def _get_uom_hours(self):
+        try:
+            return self.env.ref("product.product_uom_hour").id
+        except ValueError, e:
+            return False
+    project_time_mode_id = fields.Many2one('product.uom', string='Timesheet UoM', default=_get_uom_hours)
+
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
     timesheet_cost = fields.Float(string='Timesheet Cost', default=0.0)
@@ -55,7 +65,7 @@ class AccountAnalyticLine(models.Model):
                         cost = emp[0].timesheet_cost
                     line.write({
                         'product_id': sol.product_id.id,
-                        'product_uom_id': self.env.user.company_id.timesheet_uom_id.id or sol.product_id.uom_id.id,
+                        'product_uom_id': self.env.user.company_id.project_time_mode_id.id or sol.product_id.uom_id.id,
                         'amount': -line.unit_amount * timesheet_cost,
                         'so_line': sol.id
                     })

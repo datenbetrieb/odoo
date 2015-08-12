@@ -18,8 +18,7 @@ class procurement_order(osv.osv):
         res = super(procurement_order, self)._assign(cr, uid, procurement, context=context)
         if not res:
             #if there isn't any specific procurement.rule defined for the product, we may want to create a task
-            if self._is_procurement_task(cr, uid, procurement, context=context):
-                return True
+            return self._is_procurement_task(cr, uid, procurement, context=context):
         return res
 
     def _run(self, cr, uid, procurement, context=None):
