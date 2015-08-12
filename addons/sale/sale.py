@@ -14,7 +14,6 @@ import openerp.addons.decimal_precision as dp
 from openerp.exceptions import UserError
 
 
-
 class res_company(models.Model):
     _inherit = "res.company"
     sale_note = fields.Text(string='Default Terms and Conditions', translate=True)
@@ -736,6 +735,9 @@ class ProductProduct(models.Model):
 
 class product_template(models.Model):
     _inherit = 'product.template'
+    track_service = fields.Selection([('manual', 'Manually set quantities on order')],
+        string='Track Service', default='manual'
+    )
 
     @api.one
     @api.depends('product_variant_ids.sales_count')

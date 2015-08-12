@@ -4,6 +4,8 @@
 from openerp import models, api, fields, exceptions
 from openerp.tools.translate import _
 
+from openerp.exceptions import UserError
+
 class ResCompany(models.Model):
     _inherit = 'res.company'
     @api.model
@@ -20,14 +22,14 @@ class HrEmployee(models.Model):
 
 class product_template(models.Model):
     _inherit = 'product.template'
-    is_timesheet = fields.Boolean(string="Track Service Time")
+    track_service = fields.Selection(selection_add=[('timesheet', 'Timesheets on contract')])
 
     @api.onchange('type', 'invoice_policy')
     def onchange_type_timesheet(self):
         if self.type=='service' and self.invoice_policy=='time material':
-            self.is_timesheet = True
+            self.track_service = 'timesheet'
         if self.type<>'service':
-            self.is_timesheet = False
+            self.track_service = 'manual'
         return {}
 
 
@@ -51,7 +53,7 @@ class AccountAnalyticLine(models.Model):
                     sol = sol_obj.search([
                         ('order_id.project_id','=',line.account_id.id),
                         ('state','=','sale'),
-                        ('product_id.is_timesheet','=',True),
+                        ('product_id.track_service','=','timesheet'),
                         ('product_id.type','=','service')])
                     if sol:
                         sol = sol[0]
@@ -66,7 +68,7 @@ class AccountAnalyticLine(models.Model):
                     line.write({
                         'product_id': sol.product_id.id,
                         'product_uom_id': self.env.user.company_id.project_time_mode_id.id or sol.product_id.uom_id.id,
-                        'amount': -line.unit_amount * timesheet_cost,
+                        'amount': -line.unit_amount * cost,
                         'so_line': sol.id
                     })
         result = super(AccountAnalyticLine, self)._update_timesheet_line()
@@ -80,7 +82,7 @@ class SaleOrder(models.Model):
     def _check_multi_timesheet(self):
         count = 0
         for line in self.order_line:
-            if line.product_id.is_timesheet:
+            if line.product_id.track_service=='timesheet':
                 count+=1
             if count > 1:
                 raise UserError(_("You can use only one product on timesheet within the same sale order. You should split your order to include only one contract based on time and material."))
@@ -91,7 +93,7 @@ class SaleOrder(models.Model):
         result = super(SaleOrder, self).action_confirm()
         if not self.project_id:
             for line in self.order_line:
-                if line.product_id.is_timesheet:
+                if line.product_id.track_service=='timesheet':
                     self._create_analytic_account(prefix=self.product_id.default_code or None)
                     break
         return result

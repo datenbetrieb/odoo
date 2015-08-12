@@ -2,7 +2,7 @@
   Update product to automatically create tasks 
 - 
   !record {model: product.product, id: auto_task_service}: 
-    auto_create_task: True
+    track_service: task
     name: Advanced auto task Service
     type: service
     list_price: 150.0
