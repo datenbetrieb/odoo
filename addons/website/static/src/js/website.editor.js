@@ -8,6 +8,8 @@ var base = require('web_editor.base');
 var editor = require('web_editor.editor');
 var widget = require('web_editor.widget');
 var website = require('website.website');
+                $container.find('button[data-event="imageShape"][data-value="shadow"]').toggleClass("active", $(oStyle.image).hasClass("shadow"));
+                $container.find('.btn-group:has(button[data-event="imageShape"])').removeClass("hidden");
 
 var qweb = core.qweb;
 var _t = core._t;
