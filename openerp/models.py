@@ -4571,7 +4571,7 @@ class BaseModel(object):
             return
 
         # figure out the applicable order_by for the m2o
-        dest_model = self.pool[order_field_column._obj]
+        dest_model = self.env[order_field_column._obj]
         m2o_order = dest_model._order
         if not regex_order.match(m2o_order):
             # _order is complex, can't use it here, so we default to _rec_name
@@ -4604,7 +4604,7 @@ class BaseModel(object):
                 order_column = self._columns[order_field]
                 if order_column._classic_read:
                     if order_column.translate and not callable(order_column.translate):
-                        inner_clause = [self._generate_translated_field(alias, order_field, query)]
+                        inner_clauses = [self._generate_translated_field(alias, order_field, query)]
                     else:
                         inner_clauses = ['"%s"."%s"' % (alias, order_field)]
                     add_dir = True

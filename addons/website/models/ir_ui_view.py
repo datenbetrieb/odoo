@@ -8,7 +8,6 @@ from openerp import SUPERUSER_ID, api, tools
 from openerp.addons.website.models import website
 from openerp.http import request
 from openerp.osv import osv, fields
-from openerp.tools import html_escape
 
 _logger = logging.getLogger(__name__)
 
@@ -104,14 +103,6 @@ class view(osv.osv):
         return result
 
     @tools.ormcache_context('uid', 'xml_id', keys=('website_id',))
-
-        # html text need to be escaped for xml storage
-        def escape_node(node):
-            node.text = node.text and html_escape(node.text)
-            node.tail = node.tail and html_escape(node.tail)
-        escape_node(replacement)
-        for descendant in replacement.iterdescendants():
-            escape_node(descendant)
     def get_view_id(self, cr, uid, xml_id, context=None):
         if context and 'website_id' in context and not isinstance(xml_id, (int, long)):
             domain = [('key', '=', xml_id), '|', ('website_id', '=', context['website_id']), ('website_id', '=', False)]
