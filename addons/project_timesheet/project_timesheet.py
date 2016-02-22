@@ -47,17 +47,31 @@ class project_project(osv.osv):
 class task(osv.osv):
     _inherit = "project.task"
 
+    _parent_name = "parent_id"
+
     # Compute: effective_hours, total_hours, progress
     def _hours_get(self, cr, uid, ids, field_names, args, context=None):
         res = {}
-        for task in self.browse(cr, uid, ids, context=context):
-            res[task.id] = {'effective_hours': 0.0, 'remaining_hours': task.planned_hours, 'progress': 0.0, 'total_hours': task.planned_hours, 'delay_hours': 0.0}
-        tasks_data = self.pool['account.analytic.line'].read_group(cr, uid, [('task_id', 'in', ids)], ['task_id','unit_amount'], ['task_id'], context=context)
-        for data in tasks_data:
-            task = self.browse(cr, uid, data['task_id'][0], context=context)
+        task_to_read = self.search(cr, uid, [('id', 'child_of', ids)])
+        task_to_sort = {}
+        for task in self.browse(cr, uid, task_to_read, context=context):
+            res[task.id] = {
+                'effective_hours': 0.0,
+                'remaining_hours': task.planned_hours,
+                'progress': 0.0,
+                'total_hours': task.planned_hours,
+                'delay_hours': 0.0,
+                'children_effective_hours' : 0.0
+            }
+            task_to_sort[task.id] = [child.id for child in task.child_ids]
+
+        tasks_data = self.pool['account.analytic.line'].read_group(cr, uid, [('task_id', 'in', task_to_read)], ['task_id','unit_amount'], ['task_id'], context=context)
+        tasks_data_dict = {data['task_id'][0] : data for data in tasks_data}
+        for task_id in tools.topological_sort(task_to_sort):
+            task = self.browse(cr, uid, task_id, context=context)
             values = {
-                'effective_hours': data.get('unit_amount', 0.0),
-                'children_effective_hours' : sum([max(child.planned_hours, child.effective_hours) for child in task.child_ids])
+                'effective_hours': tasks_data_dict.get(task_id, {}).get('unit_amount', 0.0),
+                'children_effective_hours' : sum([max(child.planned_hours, res[child.id]['effective_hours'] + res[child.id]['children_effective_hours']) for child in task.child_ids])
             }
             values['remaining_hours'] = task.planned_hours - values['effective_hours'] - values['children_effective_hours']
             values['total_hours'] = values['remaining_hours'] + values['effective_hours']
@@ -69,21 +83,16 @@ class task(osv.osv):
             if task.stage_id and task.stage_id.fold:
                 values['progress'] = 100.0
             res[task.id] = values
-        return res
+        return {k : val for k, val in res.iteritems() if k in ids}
 
     def _get_task(self, cr, uid, ids, context=None):
         res = []
         for line in self.pool.get('account.analytic.line').search_read(cr,uid,[('task_id', '!=', False),('id','in',ids)], context=context):
             res.append(line['task_id'][0])
-        for task in self.pool.get('project.task').search_read(cr, uid, [('parent_id', '!=', False),('id','in',res)], ['parent_id'], context=context):
-            res.append(task['parent_id'][0])
-        return res
+        return self.pool.get('project.task').search(cr, uid, [('id', 'parent_of', res)])
 
     def _get_parent_task(self, cr, uid, ids, context=None):
-        res = list(ids)
-        for task in self.search_read(cr, uid, [('parent_id', '!=', False), ('id', 'in', ids)], ['parent_id'], context=context):
-            res.append(task['parent_id'][0])
-        return res
+        return self.pool.get('project.task').search(cr, uid, [('id', 'parent_of', ids)])
 
     def _get_total_hours(self):
         return super(task, self)._get_total_hours() + self.effective_hours
@@ -122,13 +131,15 @@ class task(osv.osv):
         'timesheet_ids': fields.one2many('account.analytic.line', 'task_id', 'Timesheets'),
         'analytic_account_id': fields.related('project_id', 'analytic_account_id',
             type='many2one', relation='account.analytic.account', string='Analytic Account', store=True),
-        'parent_id' : fields.many2one('project.task', string='Parent Task',select=True, domain=[('parent_id', '=', False)]),
+        'parent_id' : fields.many2one('project.task', string='Parent Task',select=True),
         'child_ids' : fields.one2many('project.task', 'parent_id', string="Children Tasks"),
     }
 
     _defaults = {
         'progress': 0,
     }
+
+    _constraints = [(osv.osv._check_recursion, 'Error! You can not create recursive task.', ['parent_id'])]
 
     def _prepare_delegate_values(self, cr, uid, ids, delegate_data, context=None):
         vals = super(task, self)._prepare_delegate_values(cr, uid, ids, delegate_data, context)
@@ -148,7 +159,7 @@ class task(osv.osv):
     def create_sub_task(self, cr, uid, ids, context=None):
         #need an ensure one
         task = self.browse(cr, uid, ids, context=context)[0]
-        default = {'parent_id' : task.id, 'planned_hours' : 0.0}
+        default = {'parent_id' : task.id, 'planned_hours' : 0.0, 'description' : ''}
         sub_task_id = self.copy(cr, uid, task.id, default=default, context=context)
         return {
             "type": "ir.actions.act_window",

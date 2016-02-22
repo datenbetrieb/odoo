@@ -56,7 +56,7 @@
             <field name="inherit_id" ref="project.view_task_form2" />
             <field name="arch" type="xml">
                 <field name="stage_id" position="before">
-                    <button name="create_sub_task" type="object" string="Create Sub Task" attrs="{'invisible' : [('parent_id', '!=', False)]}" />
+                    <button name="create_sub_task" type="object" string="Create Sub Task" />
                 </field>
                 <field name="project_id" position="attributes">
                     <attribute name="on_change">onchange_project(project_id)</attribute>
@@ -137,8 +137,7 @@
                       <span t-att-class="'pull-left label label-' + (record.progress.raw_value &gt;= 99 ? 'danger': 'warning')" 
                             style="margin-right: 4px;"
                             groups="project.group_time_work_estimation_tasks" >
-                           <t t-esc="_.str.sprintf('%d', record.remaining_hours.raw_value)"/>h
-                           <!-- <t t-esc="_.str.sprintf('%d', record.progress.raw_value)"/>%  -->
+                           <t t-esc="_.str.sprintf('%d', record.progress.raw_value)"/>
                       </span>
                    </t>
                </div>
