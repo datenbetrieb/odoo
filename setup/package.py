@@ -174,7 +174,7 @@ class KVM(object):
         print " ".join(l)
         self.pid=os.spawnvp(os.P_NOWAIT, l[0], l)
         time.sleep(10)
-        signal.alarm(2400)
+        signal.alarm(3600)
         signal.signal(signal.SIGALRM, self.timeout)
         try:
             self.run()
