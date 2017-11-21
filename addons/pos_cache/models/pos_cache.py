@@ -5,6 +5,7 @@ import json
 from ast import literal_eval
 
 from odoo import models, fields, api
+from odoo.tools import pycompat
 
 
 class pos_cache(models.Model):
@@ -29,7 +30,7 @@ class pos_cache(models.Model):
                                          lang=self.compute_user_id.lang)
         res = prod_ctx.read(self.get_product_fields())
         datas = {
-            'cache': base64.encodestring(json.dumps(res)),
+            'cache': base64.encodestring(json.dumps(res).encode('utf-8')),
         }
 
         self.write(datas)
@@ -49,7 +50,7 @@ class pos_cache(models.Model):
             self.product_fields = str(fields)
             self.refresh_cache()
 
-        return json.loads(base64.decodestring(self.cache))
+        return json.loads(pycompat.to_text(base64.decodestring(self.cache)))
 
 
 class pos_config(models.Model):
