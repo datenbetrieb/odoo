@@ -763,7 +763,7 @@ if records:
         <menuitem id="menu_hr_expense_to_approve" name="To Approve" sequence="2" parent="menu_hr_expense_root" groups="hr_expense.group_hr_expense_user"/>
         <menuitem id="menu_hr_expense_sheet_all_to_approve" name="Expense Reports To Approve" sequence="1" parent="menu_hr_expense_to_approve"
             action="action_hr_expense_sheet_all_to_approve"/>
-        
+
         <menuitem id="menu_hr_expense_accountant" name="Accountant" sequence="3" parent="menu_hr_expense_root" groups="hr_expense.group_hr_expense_manager"/>
         <menuitem id="menu_hr_expense_sheet_all_to_post" name="Expense Reports To Post" sequence="2" parent="menu_hr_expense_accountant"
             action="action_hr_expense_sheet_all_to_post"/>
@@ -777,6 +777,6 @@ if records:
 
         <menuitem id="menu_hr_expense_configuration" name="Configuration" parent="menu_hr_expense_root"
             sequence="100"/>
-        <menuitem id="menu_hr_product" name="Expense Products" parent="menu_hr_expense_configuration" 
+        <menuitem id="menu_hr_product" name="Expense Products" parent="menu_hr_expense_configuration"
             action="hr_expense_product" groups="hr_expense.group_hr_expense_manager" sequence="10"/>
 </odoo>
